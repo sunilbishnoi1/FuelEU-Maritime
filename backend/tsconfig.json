@@ -11,10 +11,10 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
+    "module": "esnext",
     "target": "esnext",
     "lib": ["esnext"],
-    "types": ["node"],
+    "types": ["node", "jest"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -39,10 +39,10 @@
 
     // Recommended Options
     "strict": true,
-    "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "esModuleInterop": true
   }
 }
