@@ -43,14 +43,29 @@ const RoutesPage: React.FC = () => {
     setFilters(newFilters);
   };
 
-  if (loading) return <p>Loading routes...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
+        <h3 className="font-semibold mb-2">Error</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Routes Overview</h2>
-        <FiltersBar onFilterChange={handleFilterChange} />
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-emerald-900 mb-2">Routes Overview</h1>
+        <p className="text-slate-600">Manage and analyze your shipping routes</p>
+      </div>
+      <FiltersBar onFilterChange={handleFilterChange} />
+      {loading ? (
+        <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
+          <p className="text-slate-600">Loading routes...</p>
+        </div>
+      ) : (
         <RoutesTable routes={routes} onSetBaseline={handleSetBaseline} />
+      )}
     </>
   );
 };

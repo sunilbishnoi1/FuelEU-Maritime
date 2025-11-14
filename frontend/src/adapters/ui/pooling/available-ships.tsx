@@ -15,23 +15,25 @@ export const AvailableShips: React.FC<AvailableShipsProps> = ({
   onSelectShip,
 }) => {
   return (
-    <Card className="p-4">
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">Available Ships for Pooling</h3>
-      <div className="space-y-3 max-h-60 overflow-y-auto">
+    <Card className="p-6">
+      <h3 className="text-lg font-semibold mb-4 text-emerald-900">Available Ships</h3>
+      <div className="space-y-3 max-h-96 overflow-y-auto">
         {ships.length === 0 ? (
-          <p className="text-gray-500">No ships available for pooling in this year.</p>
+          <p className="text-slate-600">No ships available for pooling</p>
         ) : (
           ships.map((ship) => (
-            <div key={ship.ship_id} className="flex items-center justify-between">
-              <label htmlFor={`ship-${ship.ship_id}`} className="flex items-center gap-2 cursor-pointer">
+            <div key={ship.ship_id} className="flex items-center justify-between p-3 rounded-lg hover:bg-emerald-50 transition-colors border border-slate-200">
+              <label htmlFor={`ship-${ship.ship_id}`} className="flex items-center gap-3 cursor-pointer flex-1">
                 <Checkbox
                   id={`ship-${ship.ship_id}`}
                   checked={selectedShipIds.includes(ship.ship_id)}
                   onCheckedChange={(checked) => onSelectShip(ship.ship_id, checked as boolean)}
                 />
-                <span className="text-gray-700">Ship {ship.ship_id}</span>
+                <span className="font-medium text-emerald-700">Ship {ship.ship_id}</span>
               </label>
-              <span className="text-sm text-gray-600">CB: {ship.adjusted_cb_gco2eq.toFixed(2)} gCO₂eq</span>
+              <span className="text-xs font-mono text-slate-600 ml-2">
+                {ship.adjusted_cb_gco2eq >= 0 ? '+' : ''}{ship.adjusted_cb_gco2eq.toFixed(2)}
+              </span>
             </div>
           ))
         )}

@@ -102,7 +102,10 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
   };
 
   return (
-    <Card className="p-4">
+    <Card className="p-6">
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-emerald-900">GHG Intensity Chart</h3>
+      </div>
       <Chart type='bar' data={data} options={options} />
     </Card>
   );

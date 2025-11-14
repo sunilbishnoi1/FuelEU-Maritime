@@ -16,33 +16,46 @@ interface RoutesTableProps {
 }
 
 export const RoutesTable: React.FC<RoutesTableProps> = ({ routes, onSetBaseline }) => {
+  if (routes.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-slate-200 p-12 text-center">
+        <p className="text-slate-600">No routes available</p>
+      </div>
+    );
+  }
+
   return (
-    <div className=" bg-white p-4 mt-8 rounded-lg shadow-md">
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm mt-6">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Route ID</TableHead>
-            <TableHead>Vessel Type</TableHead>
-            <TableHead>Fuel Type</TableHead>
-            <TableHead>Year</TableHead>
-            <TableHead>GHG Intensity (gCO₂e/MJ)</TableHead>
-            <TableHead>Fuel Consumption (t)</TableHead>
-            <TableHead>Distance (km)</TableHead>
-            <TableHead>Total Emissions (t)</TableHead>
-            <TableHead>Actions</TableHead>
+          <TableRow className="bg-slate-50 border-b border-slate-200">
+            <TableHead className="text-emerald-900 font-semibold">Route ID</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Vessel Type</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Fuel Type</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Year</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">GHG Intensity</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Fuel (t)</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Distance (km)</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Emissions (t)</TableHead>
+            <TableHead className="text-emerald-900 font-semibold">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {routes.map((route) => (
-            <TableRow key={route.id}>
-              <TableCell className="font-medium">{route.routeId}</TableCell>
-              <TableCell>{route.vesselType}</TableCell>
-              <TableCell>{route.fuelType}</TableCell>
-              <TableCell>{route.year}</TableCell>
-              <TableCell>{route.ghgIntensity.toFixed(2)}</TableCell>
-              <TableCell>{route.fuelConsumption.toFixed(2)}</TableCell>
-              <TableCell>{route.distance.toFixed(2)}</TableCell>
-              <TableCell>{route.totalEmissions.toFixed(2)}</TableCell>
+          {routes.map((route, idx) => (
+            <TableRow
+              key={route.id}
+              className={`border-b border-slate-200 hover:bg-emerald-50 transition-colors ${
+                idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'
+              }`}
+            >
+              <TableCell className="font-semibold text-emerald-700">{route.routeId}</TableCell>
+              <TableCell className="text-slate-700">{route.vesselType}</TableCell>
+              <TableCell className="text-slate-700">{route.fuelType}</TableCell>
+              <TableCell className="text-slate-700">{route.year}</TableCell>
+              <TableCell className="text-slate-700 font-mono text-sm">{route.ghgIntensity.toFixed(2)}</TableCell>
+              <TableCell className="text-slate-700 font-mono text-sm">{route.fuelConsumption.toFixed(2)}</TableCell>
+              <TableCell className="text-slate-700 font-mono text-sm">{route.distance.toFixed(2)}</TableCell>
+              <TableCell className="text-slate-700 font-mono text-sm">{route.totalEmissions.toFixed(2)}</TableCell>
               <TableCell>
                 <Button
                   variant="outline"

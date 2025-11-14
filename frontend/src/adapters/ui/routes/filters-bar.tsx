@@ -47,57 +47,61 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-wrap gap-4 items-end">
-      <div className="flex-1 min-w-[150px] mb-4">
-        <label
-          htmlFor="vesselType"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Vessel Type
-        </label>
-        <CustomSelect
-          id="vesselType"
-          value={vesselType}
-          onValueChange={setVesselType}
-          options={vesselTypeOptions}
-          placeholder="Select vessel type"
-        />
-      </div>
-      <div className="flex-1 min-w-[150px] mb-4">
-        <label
-          htmlFor="fuelType"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Fuel Type
-        </label>
-        <CustomSelect
-          id="fuelType"
-          value={fuelType}
-          onValueChange={setFuelType}
-          options={fuelTypeOptions}
-          placeholder="Select fuel type"
-        />
-      </div>
-      <div className="flex-1 min-w-[100px] mb-4">
-        <label
-          htmlFor="year"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Year
-        </label>
-        <CustomSelect
-          id="year"
-          value={year}
-          onValueChange={setYear}
-          options={yearOptions}
-          placeholder="Select year"
-        />
-      </div>
-      <div className="flex gap-2">
-        <Button onClick={handleApplyFilters}>Apply Filters</Button>
-        <Button variant="outline" onClick={handleClearFilters}>
-          Clear Filters
-        </Button>
+    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mb-6">
+      <div className="flex flex-col lg:flex-row flex-wrap gap-4 items-end">
+        <div className="flex-1 min-w-[180px]">
+          <label
+            htmlFor="vesselType"
+            className="block text-sm font-semibold text-emerald-900 mb-2"
+          >
+            Vessel Type
+          </label>
+          <CustomSelect
+            id="vesselType"
+            value={vesselType}
+            onValueChange={setVesselType}
+            options={vesselTypeOptions}
+            placeholder="Select vessel type"
+          />
+        </div>
+        <div className="flex-1 min-w-[180px]">
+          <label
+            htmlFor="fuelType"
+            className="block text-sm font-semibold text-emerald-900 mb-2"
+          >
+            Fuel Type
+          </label>
+          <CustomSelect
+            id="fuelType"
+            value={fuelType}
+            onValueChange={setFuelType}
+            options={fuelTypeOptions}
+            placeholder="Select fuel type"
+          />
+        </div>
+        <div className="flex-1 min-w-[140px]">
+          <label
+            htmlFor="year"
+            className="block text-sm font-semibold text-emerald-900 mb-2"
+          >
+            Year
+          </label>
+          <CustomSelect
+            id="year"
+            value={year}
+            onValueChange={setYear}
+            options={yearOptions}
+            placeholder="Select year"
+          />
+        </div>
+        <div className="flex gap-3">
+          <Button onClick={handleApplyFilters} variant="primary">
+            Apply
+          </Button>
+          <Button variant="outline" onClick={handleClearFilters}>
+            Clear
+          </Button>
+        </div>
       </div>
     </div>
   );

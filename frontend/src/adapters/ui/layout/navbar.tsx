@@ -1,5 +1,4 @@
 import React from 'react';
-import { Tabs, Tab } from '@heroui/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface NavItem {
@@ -21,32 +20,24 @@ const Navbar: React.FC = () => {
 
   const selectedTab = navItems.find((item: NavItem) => location.pathname.startsWith(item.path))?.id || 'routes';
 
-  const handleSelectionChange = (key: React.Key) => {
-    const selectedItem = navItems.find(item => item.id === key);
-    if (selectedItem) {
-      navigate(selectedItem.path);
-    }
-  };
-
   return (
-    <nav className="bg-white p-4 shadow-md">
-      <div className="container mx-auto flex w-full flex-col items-center">
-        <Tabs
-          aria-label="Navigation tabs"
-          items={navItems}
-          selectedKey={selectedTab}
-          onSelectionChange={handleSelectionChange}
-          classNames={{
-            tabList: "gap-4 w-full relative rounded-xl p-1 bg-gray-100 text-gray-800",
-            cursor: "w-full bg-blue-500 rounded-xl",
-            tab: "max-w-fit px-4 h-8 text-gray-700",
-            tabContent: "group-data-[selected=true]:text-white group-data-[selected=false]:text-gray-600",
-          }}
-        >
-          {(item: NavItem) => (
-            <Tab key={item.id} title={item.label} />
-          )}
-        </Tabs>
+    <nav className="bg-white border-b border-slate-200">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="flex gap-1">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.path)}
+              className={`px-6 py-4 font-semibold text-sm transition-all border-b-2 ${
+                selectedTab === item.id
+                  ? 'border-emerald-600 text-emerald-700 bg-emerald-50'
+                  : 'border-transparent text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
     </nav>
   );

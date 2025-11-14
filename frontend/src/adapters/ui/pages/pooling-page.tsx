@@ -95,8 +95,14 @@ const PoolingPage: React.FC = () => {
     }
   };
 
-  if (loading) return <p>Loading pooling data...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
+        <h3 className="font-semibold mb-2">Error</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   const currentYear = new Date().getFullYear();
   const years = generateYears(currentYear - 5, currentYear + 5);
@@ -114,23 +120,33 @@ const PoolingPage: React.FC = () => {
 
   return (
     <>
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Pooling Overview</h2>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-emerald-900 mb-2">Pooling Overview</h1>
+        <p className="text-slate-600">Create and manage compliance pooling arrangements</p>
+      </div>
+
       <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} availableYears={years} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <div>
-          <AvailableShips
-            ships={availableShips}
-            selectedShipIds={selectedShipIds}
-            onSelectShip={handleShipSelectionChange}
-          />
+      {loading ? (
+        <div className="bg-white rounded-lg border border-slate-200 p-8 text-center mt-6">
+          <p className="text-slate-600">Loading pooling data...</p>
         </div>
-        <div>
-          <PoolValidation poolSum={poolSum} isPoolValid={isPoolValid} />
-          <PoolMembers members={membersInPoolDisplay} />
-          <CreatePoolButton onCreatePool={handleCreatePool} isPoolValid={isPoolValid} />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          <div>
+            <AvailableShips
+              ships={availableShips}
+              selectedShipIds={selectedShipIds}
+              onSelectShip={handleShipSelectionChange}
+            />
+          </div>
+          <div>
+            <PoolValidation poolSum={poolSum} isPoolValid={isPoolValid} />
+            <PoolMembers members={membersInPoolDisplay} />
+            <CreatePoolButton onCreatePool={handleCreatePool} isPoolValid={isPoolValid} />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

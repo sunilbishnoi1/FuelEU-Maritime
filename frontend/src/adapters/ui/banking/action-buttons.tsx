@@ -37,14 +37,21 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md flex gap-4">
-      <Button onClick={onBankSurplus} disabled={currentCb <= 0}>
+    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mt-6 flex flex-col sm:flex-row gap-4">
+      <Button
+        onClick={onBankSurplus}
+        disabled={currentCb <= 0}
+        variant="primary"
+      >
         Bank Surplus
       </Button>
 
       <Dialog open={isApplyDialogOpen} onOpenChange={setIsApplyDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" disabled={currentCb >= 0}>
+          <Button
+            variant="secondary"
+            disabled={currentCb >= 0}
+          >
             Apply Banked Credit
           </Button>
         </DialogTrigger>
@@ -52,12 +59,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           <DialogHeader>
             <DialogTitle>Apply Banked Credit</DialogTitle>
             <DialogDescription>
-              Enter the amount of banked credit you wish to apply to the current deficit.
+              Enter the amount of banked credit you wish to apply.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="amount" className="text-right">
+              <label htmlFor="amount" className="text-right text-sm font-semibold">
                 Amount
               </label>
               <Input
@@ -72,7 +79,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsApplyDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleApplyClick}>Apply Credit</Button>
+            <Button variant="primary" onClick={handleApplyClick}>Apply</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

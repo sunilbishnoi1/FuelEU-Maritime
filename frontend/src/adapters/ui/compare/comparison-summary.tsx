@@ -30,26 +30,36 @@ export const ComparisonSummary: React.FC<ComparisonSummaryProps> = ({
   const isCompliant = averageComparisonGhg <= targetGhgIntensity;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Baseline Average GHG Intensity</h3>
-        <p className="text-2xl font-bold text-gray-900">
-          {averageBaselineGhg.toFixed(2)} gCO₂e/MJ
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <Card className="p-6">
+        <div className="mb-3">
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Baseline Average</p>
+        </div>
+        <p className="text-3xl font-bold font-mono text-slate-900">
+          {averageBaselineGhg.toFixed(2)}
         </p>
+        <p className="text-xs text-slate-600 mt-2">gCO₂e/MJ</p>
       </Card>
-      <Card className="p-4">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Comparison Average GHG Intensity</h3>
-        <p className="text-2xl font-bold text-gray-900">
-          {averageComparisonGhg.toFixed(2)} gCO₂e/MJ
+
+      <Card className="p-6">
+        <div className="mb-3">
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Optimized Average</p>
+        </div>
+        <p className={`text-3xl font-bold font-mono ${percentDiff < 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+          {averageComparisonGhg.toFixed(2)}
         </p>
+        <p className="text-xs text-slate-600 mt-2">gCO₂e/MJ</p>
       </Card>
-      <Card className="p-4 flex flex-col justify-between">
+
+      <Card className="p-6 flex flex-col justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">Compliance Status</h3>
-          <p className="text-xl font-bold">
-            {percentDiff.toFixed(2)}% difference from baseline
+          <div className="mb-3">
+            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Compliance</p>
+          </div>
+          <p className={`text-xl font-bold ${percentDiff < 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+            {percentDiff < 0 ? '↓' : '↑'} {Math.abs(percentDiff).toFixed(2)}%
           </p>
-          <p className="text-sm text-gray-600">Target: {targetGhgIntensity.toFixed(2)} gCO₂e/MJ</p>
+          <p className="text-xs text-slate-600 mt-2">Target: {targetGhgIntensity.toFixed(2)}</p>
         </div>
         <ComplianceIndicator isCompliant={isCompliant} />
       </Card>

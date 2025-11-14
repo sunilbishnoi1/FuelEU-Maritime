@@ -3,13 +3,13 @@ import { tv, type VariantProps } from 'tailwind-variants';
 import { cn } from '../lib/utils';
 
 const cardVariants = tv({
-  base: 'rounded-xl',
+  base: 'rounded-lg border border-slate-200 bg-white',
   variants: {
     variant: {
-      default: 'bg-slate-800 border border-slate-700',
-      elevated: 'bg-slate-700 shadow-lg',
-      outlined: 'border border-slate-600 bg-transparent',
-      gradient: 'bg-gradient-to-br',
+      default: 'shadow-sm hover:shadow-md transition-shadow',
+      elevated: 'shadow-md hover:shadow-lg transition-shadow',
+      outlined: 'border-2 border-primary-300 shadow-none',
+      gradient: 'bg-gradient-to-br from-white to-slate-50',
     },
   },
   defaultVariants: {
