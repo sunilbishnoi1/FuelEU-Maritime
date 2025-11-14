@@ -32,8 +32,8 @@ const ComparePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
-        <h3 className="font-semibold mb-2">Error</h3>
+      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 text-destructive">
+        <h3 className="font-semibold mb-2">Error Loading Comparison</h3>
         <p>{error}</p>
       </div>
     );
@@ -42,13 +42,14 @@ const ComparePage: React.FC = () => {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-emerald-900 mb-2">GHG Intensity Comparison</h1>
-        <p className="text-slate-600">Compare baseline vs. optimized routes</p>
+        <h1 className="text-4xl font-bold text-secondary-900 mb-2">GHG Intensity Comparison</h1>
+        <p className="text-secondary-600">Compare baseline vs. optimized routes</p>
       </div>
 
       {loading ? (
-        <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
-          <p className="text-slate-600">Loading comparison data...</p>
+        <div className="bg-card rounded-lg border border-border p-8 text-center shadow-sm">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-3"></div>
+          <p className="text-muted-foreground">Loading comparison data...</p>
         </div>
       ) : (
         <>

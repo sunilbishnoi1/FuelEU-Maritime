@@ -26,7 +26,7 @@ import {
 } from "../../tests/mocks/mock-repositories.js";
 
 const app = express();
-const port = 3030;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(cors());

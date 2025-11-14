@@ -24,6 +24,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   const [amountToApply, setAmountToApply] = useState<string>('');
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState<boolean>(false);
+  const [validationError, setValidationError] = useState<string>('');
 
   const handleApplyClick = () => {
     const amount = parseFloat(amountToApply);
@@ -31,13 +32,14 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       onApplyBankedCredit(amount);
       setIsApplyDialogOpen(false);
       setAmountToApply('');
+      setValidationError('');
     } else {
-      alert('Please enter a valid positive amount to apply.');
+      setValidationError('Please enter a valid positive amount to apply.');
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mt-6 flex flex-col sm:flex-row gap-4">
+    <div className="bg-card p-6 rounded-lg border border-border shadow-sm mt-6 flex flex-col sm:flex-row gap-4">
       <Button
         onClick={onBankSurplus}
         disabled={currentCb <= 0}
@@ -71,11 +73,17 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                 id="amount"
                 type="number"
                 value={amountToApply}
-                onChange={(e) => setAmountToApply(e.target.value)}
+                onChange={(e) => {
+                  setAmountToApply(e.target.value);
+                  setValidationError('');
+                }}
                 className="col-span-3"
                 placeholder="e.g., 1000"
               />
             </div>
+            {validationError && (
+              <div className="text-destructive text-sm">{validationError}</div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsApplyDialogOpen(false)}>Cancel</Button>

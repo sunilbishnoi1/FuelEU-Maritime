@@ -47,12 +47,12 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm mb-6">
-      <div className="flex flex-col lg:flex-row flex-wrap gap-4 items-end">
-        <div className="flex-1 min-w-[180px]">
+    <div className="bg-card p-6 rounded-lg border border-border shadow-sm mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+        <div className="lg:col-span-3">
           <label
             htmlFor="vesselType"
-            className="block text-sm font-semibold text-emerald-900 mb-2"
+            className="block text-sm font-semibold text-secondary-900 mb-2"
           >
             Vessel Type
           </label>
@@ -64,10 +64,10 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
             placeholder="Select vessel type"
           />
         </div>
-        <div className="flex-1 min-w-[180px]">
+        <div className="lg:col-span-3">
           <label
             htmlFor="fuelType"
-            className="block text-sm font-semibold text-emerald-900 mb-2"
+            className="block text-sm font-semibold text-secondary-900 mb-2"
           >
             Fuel Type
           </label>
@@ -79,10 +79,10 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
             placeholder="Select fuel type"
           />
         </div>
-        <div className="flex-1 min-w-[140px]">
+        <div className="lg:col-span-3">
           <label
             htmlFor="year"
-            className="block text-sm font-semibold text-emerald-900 mb-2"
+            className="block text-sm font-semibold text-secondary-900 mb-2"
           >
             Year
           </label>
@@ -94,11 +94,11 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
             placeholder="Select year"
           />
         </div>
-        <div className="flex gap-3">
-          <Button onClick={handleApplyFilters} variant="primary">
+        <div className="lg:col-span-3 flex gap-3">
+          <Button onClick={handleApplyFilters} variant="primary" className="flex-1">
             Apply
           </Button>
-          <Button variant="outline" onClick={handleClearFilters}>
+          <Button variant="outline" onClick={handleClearFilters} className="flex-1">
             Clear
           </Button>
         </div>

@@ -5,7 +5,24 @@ import {
   type PoolMember,
 } from "../../types";
 
-const API_BASE_URL = "http://localhost:3030";
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    if (hostname.includes('.replit.dev') || hostname.includes('.replit.app')) {
+      return `${protocol}//${hostname.replace('-5000', '-3000')}`;
+    }
+  }
+  
+  return "http://localhost:3000";
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {

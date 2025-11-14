@@ -2,7 +2,7 @@
 
 [![Architecture](https://img.shields.io/badge/Architecture-Hexagonal-purple)](./ARCHITECTURE.md)
 
-![Dashboard Screenshot](./docs/screenshot.png)
+![Dashboard Screenshot](./docs/screenshot1.png)
 
 ## 🎯 Overview
 
@@ -130,8 +130,12 @@ NOTE: test cases for Frontend are not implemented yet
 - **Intuitive UI**: A modern, responsive dashboard designed for clarity and ease of use, featuring interactive charts and data visualizations.
 - **API-First Design**: A well-defined API contract between frontend and backend.
 
-## Sample Requests/Responses
+## Screenshot and Sample Requests/Responses
 
+### Compare page
+![Dashboard Screenshot](./docs/screenshot2.png)
+
+### Sample API Request
 
 ```http
 GET /api/routes

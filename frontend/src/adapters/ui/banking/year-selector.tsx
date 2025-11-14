@@ -18,8 +18,8 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
   }));
 
   return (
-    <div className="mb-6 p-4 rounded-lg shadow-md bg-white">
-      <label htmlFor="year-select" className="block text-sm font-medium text-gray-700 mb-1">Select Year</label>
+    <div className="mb-6 p-6 rounded-lg shadow-sm bg-card border border-border">
+      <label htmlFor="year-select" className="block text-sm font-semibold text-secondary-900 mb-2">Select Year</label>
       <CustomSelect
         id="year-select"
         value={String(selectedYear)}

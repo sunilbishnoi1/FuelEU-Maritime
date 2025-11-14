@@ -29,6 +29,7 @@ const PoolingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [poolSum, setPoolSum] = useState<number>(0);
   const [isPoolValid, setIsPoolValid] = useState<boolean>(false);
+  const [validationError, setValidationError] = useState<string>('');
 
   const fetchPoolingData = async (year: number) => {
     try {
@@ -63,7 +64,13 @@ const PoolingPage: React.FC = () => {
     // 3. Surplus ship cannot exit negative (cb_after < 0 for surplus ships)
     // For now, we'll implement rule 1. Rules 2 and 3 require more complex logic involving cb_before/cb_after which are not directly in AdjustedCompliance.
     // This will be handled when creating the pool on the backend and validating the response.
-    setIsPoolValid(sum >= 0 && selectedShipIds.length > 0);
+    const isValid = sum >= 0 && selectedShipIds.length > 0;
+    setIsPoolValid(isValid);
+    
+    // Clear validation error when pool becomes valid
+    if (isValid) {
+      setValidationError('');
+    }
   }, [selectedShipIds, availableShips]);
 
   const handleShipSelectionChange = (shipId: string, isSelected: boolean) => {
@@ -74,9 +81,10 @@ const PoolingPage: React.FC = () => {
 
   const handleCreatePool = async () => {
     if (!isPoolValid) {
-      alert('Pool is not valid. Please ensure the sum of adjusted CB is non-negative and at least one ship is selected.');
+      setValidationError('Pool is not valid. Please ensure the sum of adjusted CB is non-negative and at least one ship is selected.');
       return;
     }
+    setValidationError('');
     try {
       setLoading(true);
       const poolRequest: PoolCreationRequest = {
@@ -97,8 +105,8 @@ const PoolingPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
-        <h3 className="font-semibold mb-2">Error</h3>
+      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 text-destructive">
+        <h3 className="font-semibold mb-2">Error Loading Pooling Data</h3>
         <p>{error}</p>
       </div>
     );
@@ -121,15 +129,16 @@ const PoolingPage: React.FC = () => {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-emerald-900 mb-2">Pooling Overview</h1>
-        <p className="text-slate-600">Create and manage compliance pooling arrangements</p>
+        <h1 className="text-4xl font-bold text-secondary-900 mb-2">Pooling Overview</h1>
+        <p className="text-secondary-600">Create and manage compliance pooling arrangements</p>
       </div>
 
       <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} availableYears={years} />
 
       {loading ? (
-        <div className="bg-white rounded-lg border border-slate-200 p-8 text-center mt-6">
-          <p className="text-slate-600">Loading pooling data...</p>
+        <div className="bg-card rounded-lg border border-border p-8 text-center mt-6 shadow-sm">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-3"></div>
+          <p className="text-muted-foreground">Loading pooling data...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
@@ -141,6 +150,11 @@ const PoolingPage: React.FC = () => {
             />
           </div>
           <div>
+            {validationError && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive mb-4">
+                <p className="text-sm font-medium">{validationError}</p>
+              </div>
+            )}
             <PoolValidation poolSum={poolSum} isPoolValid={isPoolValid} />
             <PoolMembers members={membersInPoolDisplay} />
             <CreatePoolButton onCreatePool={handleCreatePool} isPoolValid={isPoolValid} />

@@ -33,33 +33,33 @@ export const ComparisonSummary: React.FC<ComparisonSummaryProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <Card className="p-6">
         <div className="mb-3">
-          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Baseline Average</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Baseline Average</p>
         </div>
-        <p className="text-3xl font-bold font-mono text-slate-900">
+        <p className="text-3xl font-bold font-mono text-secondary-900">
           {averageBaselineGhg.toFixed(2)}
         </p>
-        <p className="text-xs text-slate-600 mt-2">gCO₂e/MJ</p>
+        <p className="text-xs text-muted-foreground mt-2">gCO₂e/MJ</p>
       </Card>
 
       <Card className="p-6">
         <div className="mb-3">
-          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Optimized Average</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Optimized Average</p>
         </div>
-        <p className={`text-3xl font-bold font-mono ${percentDiff < 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+        <p className={`text-3xl font-bold font-mono ${percentDiff < 0 ? 'text-primary-700' : 'text-destructive'}`}>
           {averageComparisonGhg.toFixed(2)}
         </p>
-        <p className="text-xs text-slate-600 mt-2">gCO₂e/MJ</p>
+        <p className="text-xs text-muted-foreground mt-2">gCO₂e/MJ</p>
       </Card>
 
       <Card className="p-6 flex flex-col justify-between">
         <div>
           <div className="mb-3">
-            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Compliance</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Compliance</p>
           </div>
-          <p className={`text-xl font-bold ${percentDiff < 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+          <p className={`text-xl font-bold ${percentDiff < 0 ? 'text-primary-700' : 'text-destructive'}`}>
             {percentDiff < 0 ? '↓' : '↑'} {Math.abs(percentDiff).toFixed(2)}%
           </p>
-          <p className="text-xs text-slate-600 mt-2">Target: {targetGhgIntensity.toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground mt-2">Target: {targetGhgIntensity.toFixed(2)}</p>
         </div>
         <ComplianceIndicator isCompliant={isCompliant} />
       </Card>

@@ -19,6 +19,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.24",
+    "fuel-eu-maritime": "file:..",
     "lucide-react": "^0.553.0",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
