@@ -7,6 +7,7 @@ import {
   MockComplianceRepository,
   MockBankingRepository,
   MockPoolingRepository,
+  MockShipRepository, // New import
 } from "tests/mocks/mock-repositories";
 import {
   createRoute,
@@ -78,15 +79,18 @@ describe("Edge Cases Tests", () => {
     let mockComplianceRepository: MockComplianceRepository;
     let mockRoutesRepository: MockRoutesRepository;
     let mockBankingRepository: MockBankingRepository;
+    let mockShipRepository: MockShipRepository; // New declaration
 
     beforeEach(() => {
       mockComplianceRepository = new MockComplianceRepository();
       mockRoutesRepository = new MockRoutesRepository();
       mockBankingRepository = new MockBankingRepository();
+      mockShipRepository = new MockShipRepository(); // New instantiation
       complianceService = new ComplianceService(
         mockComplianceRepository,
         mockRoutesRepository,
         mockBankingRepository,
+        mockShipRepository, // New argument
       );
     });
 
@@ -415,11 +419,13 @@ describe("Edge Cases Tests", () => {
     let mockComplianceRepository: MockComplianceRepository;
     let mockBankingRepository: MockBankingRepository;
     let mockRoutesRepository: MockRoutesRepository;
+    let mockShipRepository: MockShipRepository; // New declaration
 
     beforeEach(() => {
       mockComplianceRepository = new MockComplianceRepository();
       mockBankingRepository = new MockBankingRepository();
       mockRoutesRepository = new MockRoutesRepository();
+      mockShipRepository = new MockShipRepository(); // New instantiation
 
       const baseline = createRoute("baseline", 89.3368, true);
       mockRoutesRepository.setRoutes([baseline]);
@@ -428,6 +434,7 @@ describe("Edge Cases Tests", () => {
         mockComplianceRepository,
         mockRoutesRepository,
         mockBankingRepository,
+        mockShipRepository, // New argument
       );
 
       bankingService = new BankingService(

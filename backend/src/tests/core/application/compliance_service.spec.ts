@@ -3,6 +3,7 @@ import {
   MockComplianceRepository,
   MockRoutesRepository,
   MockBankingRepository,
+  MockShipRepository, // New import
 } from "tests/mocks/mock-repositories";
 import {
   BASELINE_ROUTE,
@@ -20,15 +21,18 @@ describe("ComplianceService", () => {
   let mockComplianceRepository: MockComplianceRepository;
   let mockRoutesRepository: MockRoutesRepository;
   let mockBankingRepository: MockBankingRepository;
+  let mockShipRepository: MockShipRepository; // New declaration
 
   beforeEach(() => {
     mockComplianceRepository = new MockComplianceRepository();
     mockRoutesRepository = new MockRoutesRepository();
     mockBankingRepository = new MockBankingRepository();
+    mockShipRepository = new MockShipRepository(); // New instantiation
     complianceService = new ComplianceService(
       mockComplianceRepository,
       mockRoutesRepository,
       mockBankingRepository,
+      mockShipRepository, // New argument
     );
   });
 

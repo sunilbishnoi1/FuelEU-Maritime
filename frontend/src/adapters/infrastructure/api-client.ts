@@ -9,16 +9,16 @@ const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  
+
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
-    
-    if (hostname.includes('.replit.dev') || hostname.includes('.replit.app')) {
-      return `${protocol}//${hostname.replace('-5000', '-3000')}`;
+
+    if (hostname.includes('localhost')) {
+      return `${protocol}//${hostname}:3000`;
     }
   }
-  
+
   return "http://localhost:3000";
 };
 
@@ -34,10 +34,26 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 // Routes API
 export const routesApi = {
-  getAllRoutes: async (): Promise<ApiRoute[]> => {
-    const response = await fetch(`${API_BASE_URL}/routes`);
-    return handleResponse<ApiRoute[]>(response);
-  },
+getAllRoutes: async (): Promise<ApiRoute[]> => {
+  const response = await fetch(`${API_BASE_URL}/routes`);
+  const data = await handleResponse<ApiRoute[]>(response);
+
+  // keep snake_case to match ApiRoute interface
+  return data.map(r => ({
+    id: r.id,
+    route_id: r.route_id,
+    year: Number(r.year),
+    ghg_intensity: Number(r.ghg_intensity),
+    is_baseline: r.is_baseline,
+    vessel_type: r.vessel_type,
+    fuel_type: r.fuel_type,
+    fuel_consumption: Number(r.fuel_consumption),
+    distance: Number(r.distance),
+    total_emissions: Number(r.total_emissions),
+  }));
+},
+
+
 
   setRouteAsBaseline: async (id: string): Promise<ApiRoute> => {
     const response = await fetch(`${API_BASE_URL}/routes/${id}/baseline`, {
@@ -61,11 +77,16 @@ export const complianceApi = {
   getComplianceBalance: async (
     shipId: string,
     year: number,
-  ): Promise<Compliance> => {
+  ): Promise<Compliance | null> => {
     const response = await fetch(
       `${API_BASE_URL}/compliance/cb?shipId=${shipId}&year=${year}`,
     );
-    return handleResponse<Compliance>(response);
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    return await handleResponse<Compliance>(response);
   },
 
   getAllComplianceBalances: async (year: number): Promise<Compliance[]> => {

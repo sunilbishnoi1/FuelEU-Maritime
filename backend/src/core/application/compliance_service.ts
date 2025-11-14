@@ -2,7 +2,14 @@ import { Compliance } from "../domain/compliance";
 import { type ComplianceRepository } from "../ports/compliance_repository";
 import { type RoutesRepository } from "../ports/routes_repository";
 import { type BankingRepository } from "../ports/banking_repository";
+import { type IShipRepository } from "../ports/ship_repository";
+import { type Ship } from "../domain/ship";
 import { v4 as uuidv4 } from "uuid";
+
+export interface AdjustedCbDto {
+  shipId: string;
+  adjustedCb: number | null;
+}
 
 export class ComplianceService {
   private readonly targetIntensity2025 = 89.3368; // gCO₂e/MJ
@@ -11,6 +18,7 @@ export class ComplianceService {
     private complianceRepository: ComplianceRepository,
     private routesRepository: RoutesRepository,
     private bankingRepository: BankingRepository,
+    private shipRepository: IShipRepository,
   ) {}
 
   async getComplianceBalance(
@@ -72,5 +80,19 @@ export class ComplianceService {
     );
 
     return compliance.cb_gco2eq + totalBanked;
+  }
+
+  async getAdjustedComplianceBalanceForAllShips(
+    year: number,
+  ): Promise<AdjustedCbDto[]> {
+    const allShips = await this.shipRepository.getAllShips();
+    const adjustedBalances: AdjustedCbDto[] = [];
+
+    for (const ship of allShips) {
+      const adjustedCb = await this.getAdjustedComplianceBalance(ship.id, year);
+      adjustedBalances.push({ shipId: ship.id, adjustedCb });
+    }
+
+    return adjustedBalances;
   }
 }

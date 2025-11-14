@@ -8,6 +8,11 @@ export const BASELINE_ROUTE: Route = {
   year: 2025,
   ghg_intensity: 89.3368,
   is_baseline: true,
+  vessel_type: "Container",
+  fuel_type: "HFO",
+  fuel_consumption: 5000,
+  distance: 12000,
+  total_emissions: 4500,
 };
 
 export const ROUTE_2: Route = {
@@ -16,6 +21,11 @@ export const ROUTE_2: Route = {
   year: 2025,
   ghg_intensity: 95.0,
   is_baseline: false,
+  vessel_type: "BulkCarrier",
+  fuel_type: "LNG",
+  fuel_consumption: 4800,
+  distance: 11500,
+  total_emissions: 4200,
 };
 
 export const ROUTE_3: Route = {
@@ -24,6 +34,11 @@ export const ROUTE_3: Route = {
   year: 2025,
   ghg_intensity: 85.0,
   is_baseline: false,
+  vessel_type: "Tanker",
+  fuel_type: "MGO",
+  fuel_consumption: 5100,
+  distance: 12500,
+  total_emissions: 4700,
 };
 
 export const ROUTE_4: Route = {
@@ -32,6 +47,11 @@ export const ROUTE_4: Route = {
   year: 2025,
   ghg_intensity: 100.0,
   is_baseline: false,
+  vessel_type: "RoRo",
+  fuel_type: "HFO",
+  fuel_consumption: 4900,
+  distance: 11800,
+  total_emissions: 4300,
 };
 
 export const ROUTE_5: Route = {
@@ -40,6 +60,11 @@ export const ROUTE_5: Route = {
   year: 2025,
   ghg_intensity: 80.0,
   is_baseline: false,
+  vessel_type: "Container",
+  fuel_type: "LNG",
+  fuel_consumption: 4950,
+  distance: 11900,
+  total_emissions: 4400,
 };
 
 export const ALL_ROUTES: Route[] = [
@@ -90,6 +115,11 @@ export function createRoute(
   id: string,
   intensity: number,
   isBaseline: boolean = false,
+  vesselType: string = "Container",
+  fuelType: string = "HFO",
+  fuelConsumption: number = 5000,
+  distance: number = 12000,
+  totalEmissions: number = 4500,
 ): Route {
   return {
     id,
@@ -97,6 +127,11 @@ export function createRoute(
     year: 2025,
     ghg_intensity: intensity,
     is_baseline: isBaseline,
+    vessel_type: vesselType,
+    fuel_type: fuelType,
+    fuel_consumption: fuelConsumption,
+    distance: distance,
+    total_emissions: totalEmissions,
   };
 }
 

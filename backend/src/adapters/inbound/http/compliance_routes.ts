@@ -34,21 +34,37 @@ export function createComplianceRouter(
   complianceRouter.get("/adjusted-cb", async (req: Request, res: Response) => {
     try {
       const { shipId, year } = req.query;
-      if (!shipId || !year) {
-        return res
-          .status(400)
-          .json({ message: "shipId and year are required" });
+
+      if (!year) {
+        return res.status(400).json({ message: "year is required" });
       }
 
-      const adjustedCb = await complianceService.getAdjustedComplianceBalance(
-        shipId as string,
-        parseInt(year as string),
-      );
+      const parsedYear = parseInt(year as string);
+      if (isNaN(parsedYear)) {
+        return res.status(400).json({ message: "year must be a number" });
+      }
 
-      if (adjustedCb !== null) {
-        res.json({ shipId, year: parseInt(year as string), adjustedCb });
+      if (shipId) {
+        // Existing functionality: get adjusted CB for a specific ship
+        const adjustedCb = await complianceService.getAdjustedComplianceBalance(
+          shipId as string,
+          parsedYear,
+        );
+
+        if (adjustedCb !== null) {
+          res.json({ shipId, year: parsedYear, adjustedCb });
+        } else {
+          res
+            .status(404)
+            .json({ message: "Compliance data not found for this ship" });
+        }
       } else {
-        res.status(404).json({ message: "Compliance data not found" });
+        // New functionality: get adjusted CB for all ships
+        const allShipsAdjustedCb =
+          await complianceService.getAdjustedComplianceBalanceForAllShips(
+            parsedYear,
+          );
+        res.json(allShipsAdjustedCb);
       }
     } catch (error) {
       console.error("Error getting adjusted compliance balance:", error);

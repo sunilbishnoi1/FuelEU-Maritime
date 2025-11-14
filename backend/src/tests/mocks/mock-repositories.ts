@@ -2,11 +2,13 @@ import { type RoutesRepository } from "../../core/ports/routes_repository.js";
 import { type ComplianceRepository } from "../../core/ports/compliance_repository.js";
 import { type BankingRepository } from "../../core/ports/banking_repository.js";
 import { type PoolingRepository } from "../../core/ports/pooling_repository.js";
+import { type IShipRepository } from "../../core/ports/ship_repository.js"; // New import
 import { type Route } from "../../core/domain/route.js";
 import { Compliance } from "../../core/domain/compliance.js";
 import { BankEntry } from "../../core/domain/bank_entry.js";
 import { Pool } from "../../core/domain/pool.js";
 import { PoolMember } from "../../core/domain/pool_member.js";
+import { Ship } from "../../core/domain/ship.js"; // New import
 
 export class MockRoutesRepository implements RoutesRepository {
   private routes: Route[] = [];
@@ -142,5 +144,17 @@ export class MockPoolingRepository implements PoolingRepository {
 
   getPools(): Pool[] {
     return this.pools;
+  }
+}
+
+export class MockShipRepository implements IShipRepository {
+  private ships: Ship[] = [
+    { id: "ship-001", name: "Ship A" },
+    { id: "ship-002", name: "Ship B" },
+    { id: "ship-003", name: "Ship C" },
+  ];
+
+  async getAllShips(): Promise<Ship[]> {
+    return Promise.resolve(this.ships);
   }
 }

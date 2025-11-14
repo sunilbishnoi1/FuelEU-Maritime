@@ -4,6 +4,7 @@ export interface Route {
   vesselType: string;
   fuelType: string;
   year: number;
+  isBaseline: boolean;
   ghgIntensity: number; // gCO₂e/MJ
   fuelConsumption: number; // tons
   distance: number; // km

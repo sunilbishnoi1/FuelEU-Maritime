@@ -4,6 +4,9 @@ import { config } from "dotenv";
 config();
 
 const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // Fallback to individual variables if DATABASE_URL is not set (e.g., for local development)
+  // These will be ignored if connectionString is present
   user: process.env.DB_USER || "user",
   host: process.env.DB_HOST || "localhost",
   database: process.env.DB_NAME || "fuel_eu_maritime",

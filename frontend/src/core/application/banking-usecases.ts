@@ -14,8 +14,8 @@ export class FetchComplianceBalance implements FetchComplianceBalanceUseCase {
     this.complianceRepository = complianceRepository;
   }
 
-  async execute(year: number): Promise<ComplianceBalance> {
-    return this.complianceRepository.getComplianceBalance(year);
+  async execute(shipId: string, year: number): Promise<ComplianceBalance | null> {
+    return this.complianceRepository.getComplianceBalance(shipId, year);
   }
 }
 
@@ -26,8 +26,8 @@ export class BankSurplus implements BankSurplusUseCase {
     this.complianceRepository = complianceRepository;
   }
 
-  async execute(year: number): Promise<BankingSummary> {
-    return this.complianceRepository.bankSurplus(year);
+  async execute(shipId: string, year: number): Promise<BankingSummary> {
+    return this.complianceRepository.bankSurplus(shipId, year);
   }
 }
 
@@ -38,7 +38,7 @@ export class ApplyBankedCredit implements ApplyBankedCreditUseCase {
     this.complianceRepository = complianceRepository;
   }
 
-  async execute(year: number, amount: number): Promise<BankingSummary> {
-    return this.complianceRepository.applyBankedCredit(year, amount);
+  async execute(shipId: string, year: number, amount: number): Promise<BankingSummary> {
+    return this.complianceRepository.applyBankedCredit(shipId, year, amount);
   }
 }

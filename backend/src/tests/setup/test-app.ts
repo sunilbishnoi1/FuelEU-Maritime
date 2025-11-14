@@ -14,8 +14,9 @@ import {
   MockComplianceRepository,
   MockBankingRepository,
   MockPoolingRepository,
+  MockShipRepository, // New import
 } from "../mocks/mock-repositories";
-import { BASELINE_ROUTE } from "../fixtures/test-data";
+import { ALL_ROUTES, BASELINE_ROUTE } from "../fixtures/test-data"; // ALL_ROUTES added
 
 export function createTestApp() {
   const app = express();
@@ -31,9 +32,10 @@ export function createTestApp() {
   const mockComplianceRepository = new MockComplianceRepository();
   const mockBankingRepository = new MockBankingRepository();
   const mockPoolingRepository = new MockPoolingRepository();
+  const mockShipRepository = new MockShipRepository(); // New instantiation
 
   // Set up some initial data for routes
-  mockRoutesRepository.setRoutes([BASELINE_ROUTE]);
+  mockRoutesRepository.setRoutes(ALL_ROUTES);
 
   // Instantiate services with mock repositories
   const routesService = new RoutesService(mockRoutesRepository);
@@ -41,6 +43,7 @@ export function createTestApp() {
     mockComplianceRepository,
     mockRoutesRepository,
     mockBankingRepository,
+    mockShipRepository, // New argument
   );
   const bankingService = new BankingService(
     mockBankingRepository,

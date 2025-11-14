@@ -17,15 +17,15 @@ export interface FetchComparisonUseCase {
 
 // Use Cases for Banking Tab
 export interface FetchComplianceBalanceUseCase {
-  execute(year: number): Promise<ComplianceBalance>;
+  execute(shipId: string, year: number): Promise<ComplianceBalance | null>;
 }
 
 export interface BankSurplusUseCase {
-  execute(year: number): Promise<BankingSummary>;
+  execute(shipId: string, year: number): Promise<BankingSummary>;
 }
 
 export interface ApplyBankedCreditUseCase {
-  execute(year: number, amount: number): Promise<BankingSummary>;
+  execute(shipId: string, year: number, amount: number): Promise<BankingSummary>;
 }
 
 // Use Cases for Pooling Tab

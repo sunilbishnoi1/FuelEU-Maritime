@@ -13,12 +13,13 @@ const routeRepository = {
     return apiRoutes.map((apiRoute: ApiRoute) => ({
       id: apiRoute.id,
       routeId: apiRoute.route_id,
-      vesselType: apiRoute.vesselType,
-      fuelType: apiRoute.fuelType,
+      vesselType: apiRoute.vessel_type,
+      fuelType: apiRoute.fuel_type,
+      isBaseline: apiRoute.is_baseline,
       ghgIntensity: parseFloat(String(apiRoute.ghg_intensity)) || 0, // Ensure parsing to number, default to 0 if NaN
-      fuelConsumption: parseFloat(String(apiRoute.fuelConsumption)),
+      fuelConsumption: parseFloat(String(apiRoute.fuel_consumption)),
       distance: parseFloat(String(apiRoute.distance)),
-      totalEmissions: parseFloat(String(apiRoute.totalEmissions)),
+      totalEmissions: parseFloat(String(apiRoute.total_emissions)),
       year: apiRoute.year,
     }));
   },
@@ -34,13 +35,14 @@ const routeRepository = {
       const domainRoute: Route = {
         id: apiRoute.id,
         routeId: apiRoute.route_id,
-        vesselType: apiRoute.vesselType,
-        fuelType: apiRoute.fuelType,
+        vesselType: apiRoute.vessel_type,
+        fuelType: apiRoute.fuel_type,
+        isBaseline: apiRoute.is_baseline,
         year: apiRoute.year,
         ghgIntensity: parseFloat(String(apiRoute.ghg_intensity)) || 0, // Ensure parsing to number, default to 0 if NaN
-        fuelConsumption: apiRoute.fuelConsumption,
+        fuelConsumption: apiRoute.fuel_consumption,
         distance: apiRoute.distance,
-        totalEmissions: apiRoute.totalEmissions,
+        totalEmissions: apiRoute.total_emissions,
       };
       if (apiRoute.is_baseline) {
         baseline.push(domainRoute);
@@ -53,9 +55,11 @@ const routeRepository = {
 };
 
 const complianceRepository = {
-  getComplianceBalance: async (year: number): Promise<ComplianceBalance> => {
-    const shipId = 'ship-1'; // TODO: Replace with actual shipId from user context
-    const apiCompliance: Compliance = await complianceApi.getComplianceBalance(shipId, year);
+  getComplianceBalance: async (shipId: string, year: number): Promise<ComplianceBalance | null> => {
+    const apiCompliance: Compliance | null = await complianceApi.getComplianceBalance(shipId, year);
+    if (apiCompliance === null) {
+      return null;
+    }
     return {
       year: apiCompliance.year,
       cb_before: apiCompliance.cb_gco2eq,
@@ -64,8 +68,7 @@ const complianceRepository = {
       transactions: [], // Placeholder
     };
   },
-  bankSurplus: async (year: number): Promise<BankingSummary> => {
-    const shipId = 'ship-1'; // TODO: Replace with actual shipId from user context
+  bankSurplus: async (shipId: string, year: number): Promise<BankingSummary> => {
     const apiBankEntry: BankEntry = await bankingApi.bankComplianceBalance(shipId, year);
     // This mapping is simplified. In a real scenario, you'd fetch the current CB to get cb_before and cb_after.
     return {
@@ -75,8 +78,7 @@ const complianceRepository = {
       cb_after: 0, // Placeholder, needs actual value after banking
     };
   },
-  applyBankedCredit: async (year: number, amount: number): Promise<BankingSummary> => {
-    const shipId = 'ship-1'; // TODO: Replace with actual shipId from user context
+  applyBankedCredit: async (shipId: string, year: number, amount: number): Promise<BankingSummary> => {
     const apiBankEntry: BankEntry = await bankingApi.applyBankedSurplus(shipId, year, amount);
     // This mapping is simplified. In a real scenario, you'd fetch the current CB to get cb_before and cb_after.
     return {

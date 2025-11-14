@@ -13,6 +13,7 @@ import {
   MockBankingRepository,
   MockPoolingRepository,
   MockRoutesRepository,
+  MockShipRepository, // New import
 } from "tests/mocks/mock-repositories";
 import {
   createCompliance,
@@ -37,6 +38,7 @@ let mockComplianceRepository: MockComplianceRepository;
 let mockBankingRepository: MockBankingRepository;
 let mockRoutesRepository: MockRoutesRepository;
 let mockPoolingRepository: MockPoolingRepository;
+let mockShipRepository: MockShipRepository; // New declaration
 
 describe("Compliance HTTP Endpoints", () => {
   let consoleErrorSpy: jest.SpiedFunction<typeof console.error>;
@@ -48,6 +50,7 @@ describe("Compliance HTTP Endpoints", () => {
     mockComplianceRepository = new MockComplianceRepository();
     mockBankingRepository = new MockBankingRepository();
     mockRoutesRepository = new MockRoutesRepository();
+    mockShipRepository = new MockShipRepository(); // New instantiation
 
     mockRoutesRepository.setRoutes([BASELINE_ROUTE]);
 
@@ -56,6 +59,7 @@ describe("Compliance HTTP Endpoints", () => {
       mockComplianceRepository,
       mockRoutesRepository,
       mockBankingRepository,
+      mockShipRepository, // New argument
     );
 
     app.use("/compliance", createComplianceRouter(complianceService));

@@ -1,6 +1,7 @@
 # FuelEU Maritime Compliance Platform
 
 [![Architecture](https://img.shields.io/badge/Architecture-Hexagonal-purple)](./ARCHITECTURE.md)
+[![Live](https://img.shields.io/badge/Live-Vercel-blue)](https://fuel-eu-maritime-henna.vercel.app/)
 
 ![Dashboard Screenshot](./docs/screenshot1.png)
 
@@ -9,6 +10,8 @@
 This platform provides a comprehensive solution for monitoring and managing FuelEU Maritime compliance. It implements key regulations, including Articles 20 (Banking) and 21 (Pooling), to help shipping companies track their GHG intensity, manage compliance balances, and optimize their fleet's environmental performance.
 
 The application is built with a strong focus on architectural excellence, clean code, and a user-friendly interface, designed to provide clear insights into complex regulatory data.
+
+The project is deployed and can be seen live at [https://fuel-eu-maritime-henna.vercel.app/](https://fuel-eu-maritime-henna.vercel.app/). The backend and database are deployed on Render.
 
 ## 🏗️ Architecture
 
@@ -133,7 +136,7 @@ NOTE: test cases for Frontend are not implemented yet
 ## Screenshot and Sample Requests/Responses
 
 ### Compare page
-![Dashboard Screenshot](./docs/screenshot2.png)
+![Dashboard Screenshot](./docs/screenshot2.png)![Dashboard Screenshot](./docs/screenshot3.png)
 
 ### Sample API Request
 
@@ -146,22 +149,64 @@ GET /api/routes
 ```json
 [
   {
-    "id": "uuid-1",
-    "name": "Rotterdam-New York",
-    "vesselType": "Container Ship",
-    "fuelType": "LNG",
-    "ghgIntensity": 85.5,
-    "fuelConsumption": 12000,
-    "year": 2025
+    "id": "123bbffb-f6d1-4468-adbd-f924dbe14556",
+    "route_id": "route-004",
+    "year": 2025,
+    "ghg_intensity": "92.0",
+    "is_baseline": false,
+    "vessel_type": "RoRO",
+    "fuel_type": "HFO",
+    "fuel_consumption": "4900",
+    "distance": "11800",
+    "total_emissions": "4300"
   },
   {
-    "id": "uuid-2",
-    "name": "Shanghai-Hamburg",
-    "vesselType": "Bulk Carrier",
-    "fuelType": "HFO",
-    "ghgIntensity": 92.1,
-    "fuelConsumption": 15000,
-    "year": 2025
+    "id": "2df59d72-89fe-400b-ad33-6f475a676d1a",
+    "route_id": "route-003",
+    "year": 2025,
+    "ghg_intensity": "85.0",
+    "is_baseline": true,
+    "vessel_type": "Tanker",
+    "fuel_type": "MGO",
+    "fuel_consumption": "5100",
+    "distance": "12500",
+    "total_emissions": "4700"
+  },
+  {
+    "id": "37a1a939-1fd0-4f0a-b3d2-007a8d9012bc",
+    "route_id": "route-005",
+    "year": 2025,
+    "ghg_intensity": "78.0",
+    "is_baseline": false,
+    "vessel_type": "Container",
+    "fuel_type": "LNG",
+    "fuel_consumption": "4950",
+    "distance": "11900",
+    "total_emissions": "4400"
+  },
+  {
+    "id": "4f6fa22e-0202-43ad-95be-9cf54bedee59",
+    "route_id": "route-001",
+    "year": 2025,
+    "ghg_intensity": "80.0",
+    "is_baseline": false,
+    "vessel_type": "Container",
+    "fuel_type": "HFO",
+    "fuel_consumption": "5000",
+    "distance": "12000",
+    "total_emissions": "4500"
+  },
+  {
+    "id": "80b5d046-71ed-405e-962e-8ec4a785859b",
+    "route_id": "route-002",
+    "year": 2025,
+    "ghg_intensity": "90.0",
+    "is_baseline": false,
+    "vessel_type": "BulkCarrier",
+    "fuel_type": "LNG",
+    "fuel_consumption": "4800",
+    "distance": "11500",
+    "total_emissions": "4200"
   }
 ]
 ```

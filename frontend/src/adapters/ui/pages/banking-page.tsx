@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   fetchComplianceBalanceUseCase,
   bankSurplusUseCase,
   applyBankedCreditUseCase,
-} from '../../../core/application/service-locator';
-import type { ComplianceBalance } from '../../../core/domain/entities';
-import type { BankingSummary } from '../../../types';
-import { YearSelector } from '../banking/year-selector';
-import { CbDisplayCard } from '../banking/cb-display-card';
-import { ActionButtons } from '../banking/action-buttons';
+} from "../../../core/application/service-locator";
+import type { ComplianceBalance } from "../../../core/domain/entities";
+import type { BankingSummary } from "../../../types";
+import { YearSelector } from "../banking/year-selector";
+import { CbDisplayCard } from "../banking/cb-display-card";
+import { ActionButtons } from "../banking/action-buttons";
 
 // Helper to generate a range of years
 const generateYears = (startYear: number, endYear: number): number[] => {
@@ -20,27 +20,42 @@ const generateYears = (startYear: number, endYear: number): number[] => {
 };
 
 const BankingPage: React.FC = () => {
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [complianceBalance, setComplianceBalance] = useState<ComplianceBalance | null>(null);
-  const [bankingSummary, setBankingSummary] = useState<BankingSummary | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
+  const [shipId] = useState<string>('ship-001'); // Assuming a default shipId for now
+  const [complianceBalance, setComplianceBalance] =
+    useState<ComplianceBalance | null>(null);
+  const [bankingSummary, setBankingSummary] = useState<BankingSummary | null>(
+    null
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchComplianceData = async (year: number) => {
+  const fetchComplianceData = async (year: number, currentShipId: string) => {
     try {
       setLoading(true);
-      const cb = await fetchComplianceBalanceUseCase.execute(year);
-      setComplianceBalance(cb);
-      // For bankingSummary, we'll need to derive or fetch more detailed banking info
-      // For now, we'll use placeholders or simplified data
-      setBankingSummary({
-        year: cb.year,
-        cb_before: cb.cb_before,
-        applied: cb.applied, // Assuming 'applied' is part of ComplianceBalance for simplicity
-        cb_after: cb.cb_after, // Assuming 'cb_after' is part of ComplianceBalance for simplicity
-      });
+      setError(null); // Clear previous errors
+      const cb = await fetchComplianceBalanceUseCase.execute(currentShipId, year);
+
+      if (cb === null) {
+        setError('Compliance data not found for the selected year.');
+        setComplianceBalance(null);
+        setBankingSummary(null);
+      } else {
+        setComplianceBalance(cb);
+        // For bankingSummary, we'll need to derive or fetch more detailed banking info
+        // For now, we'll use placeholders or simplified data
+        setBankingSummary({
+          year: Number(cb.year),
+          cb_before: Number(cb.cb_before),
+          applied: Number(cb.applied),
+          cb_after: Number(cb.cb_after),
+        });
+
+      }
     } catch (err) {
-      setError('Failed to fetch compliance data.');
+      setError("Failed to fetch compliance data.");
       console.error(err);
       setComplianceBalance(null);
       setBankingSummary(null);
@@ -50,19 +65,19 @@ const BankingPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchComplianceData(selectedYear);
-  }, [selectedYear]);
+    fetchComplianceData(selectedYear, shipId);
+  }, [selectedYear, shipId]);
 
   const handleBankSurplus = async () => {
     try {
       setLoading(true);
-      const result = await bankSurplusUseCase.execute(selectedYear);
+      const result = await bankSurplusUseCase.execute(shipId, selectedYear);
       // After banking, refetch all data to get updated balances
-      await fetchComplianceData(selectedYear);
+      await fetchComplianceData(selectedYear, shipId);
       // Optionally, update bankingSummary with the result if it contains more details
       setBankingSummary(result);
     } catch (err) {
-      setError('Failed to bank surplus.');
+      setError("Failed to bank surplus.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -72,13 +87,17 @@ const BankingPage: React.FC = () => {
   const handleApplyBankedCredit = async (amount: number) => {
     try {
       setLoading(true);
-      const result = await applyBankedCreditUseCase.execute(selectedYear, amount);
+      const result = await applyBankedCreditUseCase.execute(
+        shipId,
+        selectedYear,
+        amount
+      );
       // After applying, refetch all data to get updated balances
-      await fetchComplianceData(selectedYear);
+      await fetchComplianceData(selectedYear, shipId);
       // Optionally, update bankingSummary with the result if it contains more details
       setBankingSummary(result);
     } catch (err) {
-      setError('Failed to apply banked credit.');
+      setError("Failed to apply banked credit.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -100,8 +119,12 @@ const BankingPage: React.FC = () => {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">Banking Overview</h1>
-        <p className="text-secondary-600">Manage compliance balance banking and credits</p>
+        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
+          Banking Overview
+        </h1>
+        <p className="text-secondary-600">
+          Manage compliance balance banking and credits
+        </p>
       </div>
 
       <YearSelector

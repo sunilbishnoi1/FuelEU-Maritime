@@ -6,11 +6,11 @@ export interface ApiRoute {
   is_baseline: boolean;
   percentDiff?: number;
   compliant?: boolean;
-  vesselType: string;
-  fuelType: string;
-  fuelConsumption: number; // in tons (t)
+  vessel_type: string;
+  fuel_type: string;
+  fuel_consumption: number; // in tons (t)
   distance: number; // in km
-  totalEmissions: number; // in tons (t)
+  total_emissions: number; // in tons (t)
 }
 
 export interface Compliance {

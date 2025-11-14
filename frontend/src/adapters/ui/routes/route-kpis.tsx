@@ -10,10 +10,11 @@ interface RouteKPIsProps {
 export const RouteKPIs: React.FC<RouteKPIsProps> = ({ routes, loading }) => {
   const totalRoutes = routes.length;
   const avgGHGIntensity = routes.length > 0 
-    ? routes.reduce((sum, r) => sum + r.ghgIntensity, 0) / routes.length 
+    ? routes.reduce((sum, r) => sum + Number(r.ghgIntensity), 0) / routes.length 
     : 0;
-  const totalEmissions = routes.reduce((sum, r) => sum + r.totalEmissions, 0);
-  const totalDistance = routes.reduce((sum, r) => sum + r.distance, 0);
+
+  const totalEmissions = routes.reduce((sum, r) => sum + Number(r.totalEmissions), 0);
+  const totalDistance = routes.reduce((sum, r) => sum + Number(r.distance), 0);
 
   const kpis = [
     {

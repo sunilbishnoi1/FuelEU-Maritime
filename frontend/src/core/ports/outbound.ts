@@ -8,9 +8,9 @@ export interface RouteRepository {
 }
 
 export interface ComplianceRepository {
-  getComplianceBalance(year: number): Promise<ComplianceBalance>;
-  bankSurplus(year: number): Promise<BankingSummary>;
-  applyBankedCredit(year: number, amount: number): Promise<BankingSummary>;
+  getComplianceBalance(shipId: string, year: number): Promise<ComplianceBalance | null>;
+  bankSurplus(shipId: string, year: number): Promise<BankingSummary>;
+  applyBankedCredit(shipId: string, year: number, amount: number): Promise<BankingSummary>;
   getAdjustedComplianceBalance(year: number): Promise<AdjustedCompliance[]>;
   createPool(poolRequest: PoolCreationRequest): Promise<Pool>;
 }
