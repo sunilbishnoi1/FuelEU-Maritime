@@ -733,6 +733,7 @@ This design creates a **professional, maritime-themed dashboard** that avoids th
 -   gemini-cli still has some issues like it get stuck after running cmds like "npm run dev" as it probably has no trigger to understand completion of such open ended commands
 -   copilot sometimes gets stuck in errors thats when i need to take over the code and handle issues
 -   claude gave way more detailed design plan than needed but that actually helped later when implementing the ui. gemini and copilot would've probably just given basic
+-   Claude is also good at generating good docs as i used to generate README.md and ARCHITECHTURE.md file
 
 ---
 ## Best Practices Followed
@@ -742,5 +743,3 @@ This design creates a **professional, maritime-themed dashboard** that avoids th
 -   Used github copilot to generate good commit messages
 -   kept prompts focused on single responsibility - like "refactor routes_repository first" instead of asking to refactor all repos at once. made the changes more manageable
 -   used the validation/corrections section in my log to track what worked and what didn't. helped me understand which agent is good at what type of task
-
-

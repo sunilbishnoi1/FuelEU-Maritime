@@ -84,7 +84,7 @@ npm install
 #.env: DATABASE_URL="postgresql://user:password@host:port/database"
 npm run migrate # Run database migrations
 npm run seed # Seed initial data (e.g., 5 routes)
-npm run dev # Start the backend server
+npm run dev 
 ```
 
 The backend server will typically run on `http://localhost:3000`.
@@ -94,7 +94,7 @@ The backend server will typically run on `http://localhost:3000`.
 ```bash
 cd ../frontend
 npm install
-npm run dev # Start the frontend development server
+npm run dev 
 ```
 
 The frontend application will typically run on `http://localhost:5173`.
@@ -119,7 +119,7 @@ cd frontend
 npm test
 ```
 
-This will execute tests for the React application, covering components and frontend domain logic.
+NOTE: test cases for Frontend are not implemented yet
 
 ## ✨ Highlights
 
@@ -130,11 +130,8 @@ This will execute tests for the React application, covering components and front
 - **Intuitive UI**: A modern, responsive dashboard designed for clarity and ease of use, featuring interactive charts and data visualizations.
 - **API-First Design**: A well-defined API contract between frontend and backend.
 
-## 📸 Screenshots & Sample Requests/Responses
+## Sample Requests/Responses
 
-_(Placeholder: Add screenshots of the Routes, Compare, Banking, and Pooling tabs here. Include a GIF or short video if possible.)_
-
-### Sample API Request (e.g., Get Routes)
 
 ```http
 GET /api/routes
