@@ -32,45 +32,40 @@ export function createComplianceRouter(
   });
 
   complianceRouter.get("/adjusted-cb", async (req: Request, res: Response) => {
-    try {
-      const { shipId, year } = req.query;
+  try {
+    const { shipId, year } = req.query;
 
-      if (!year) {
-        return res.status(400).json({ message: "year is required" });
-      }
-
-      const parsedYear = parseInt(year as string);
-      if (isNaN(parsedYear)) {
-        return res.status(400).json({ message: "year must be a number" });
-      }
-
-      if (shipId) {
-        // Existing functionality: get adjusted CB for a specific ship
-        const adjustedCb = await complianceService.getAdjustedComplianceBalance(
-          shipId as string,
-          parsedYear,
-        );
-
-        if (adjustedCb !== null) {
-          res.json({ shipId, year: parsedYear, adjustedCb });
-        } else {
-          res
-            .status(404)
-            .json({ message: "Compliance data not found for this ship" });
-        }
-      } else {
-        // New functionality: get adjusted CB for all ships
-        const allShipsAdjustedCb =
-          await complianceService.getAdjustedComplianceBalanceForAllShips(
-            parsedYear,
-          );
-        res.json(allShipsAdjustedCb);
-      }
-    } catch (error) {
-      console.error("Error getting adjusted compliance balance:", error);
-      res.status(500).json({ message: "Internal server error" });
+    if (!shipId) {
+      return res.status(400).json({ message: "shipId is required" });
     }
+
+    if (!year) {
+      return res.status(400).json({ message: "year is required" });
+    }
+
+    const parsedYear = parseInt(year as string);
+    if (isNaN(parsedYear)) {
+      return res.status(400).json({ message: "year must be a number" });
+    }
+
+    const adjustedCb = await complianceService.getAdjustedComplianceBalance(
+      shipId as string,
+      parsedYear,
+    );
+
+    if (adjustedCb !== null) {
+      return res.json({ shipId, year: parsedYear, adjustedCb });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "Compliance data not found for this ship" });
+    }
+  } catch (error) {
+    console.error("Error getting adjusted compliance balance:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
   });
+
 
   return complianceRouter;
 }

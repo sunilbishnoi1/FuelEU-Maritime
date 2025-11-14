@@ -1,5 +1,7 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   testEnvironment: "node",
+
   moduleNameMapper: {
     "^core/(.*)$": "<rootDir>/src/core/$1",
     "^adapters/(.*)$": "<rootDir>/src/adapters/$1",
@@ -10,27 +12,30 @@ module.exports = {
     "^tests/setup/(.*)$": "<rootDir>/src/tests/setup/$1",
     "^domain/(.*)$": "<rootDir>/src/core/domain/$1",
     "^ports/(.*)$": "<rootDir>/src/core/ports/$1",
-    "^application/(.*)$": "<rootDir>/src/core/application/$1",
+    "^application/(.*)$": "<rootDir>/src/core/application/$1"
   },
+
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
       {
         tsconfig: {
           module: "commonjs",
-          target: "esnext",
+          target: "es2022",
           esModuleInterop: true,
           allowSyntheticDefaultImports: true,
-          isolatedModules: true,
-        },
-      },
-    ],
+          isolatedModules: true
+        }
+      }
+    ]
   },
+
   roots: ["<rootDir>/src"],
   testMatch: ["**/?(*.)+(spec|test).ts"],
   moduleFileExtensions: ["ts", "js", "json", "node"],
+
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageReporters: ["json", "lcov", "text", "clover"],
-  verbose: true,
+  verbose: true
 };
