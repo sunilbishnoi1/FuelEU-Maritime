@@ -25,7 +25,7 @@ export class ComplianceService {
 
     // This is a simplification. In a real scenario, we'd have a way to get the route for a ship.
     // Here we assume the shipId is the route_id.
-    const route = await this.routesRepository.findById(shipId);
+    const route = await this.routesRepository.findByRouteId(shipId);
     if (!route) {
       return null;
     }
@@ -34,6 +34,15 @@ export class ComplianceService {
     const fuelConsumption = 1000; // in tonnes
     const energyInScope = fuelConsumption * 41000; // MJ
     const actualIntensity = route.ghg_intensity;
+
+    if (
+      typeof actualIntensity !== "number" ||
+      !Number.isFinite(actualIntensity)
+    ) {
+      throw new Error(
+        `Invalid ghg_intensity for route ${shipId}: ${actualIntensity}`,
+      );
+    }
 
     const complianceBalance =
       (this.targetIntensity2025 - actualIntensity) * energyInScope;

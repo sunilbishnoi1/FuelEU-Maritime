@@ -1,10 +1,10 @@
 import request from "supertest";
 import express from "express";
-import { jest } from '@jest/globals';
-import { createRoutesRouter } from "adapters/inbound/http/routes"
-import { RoutesService } from "core/application/routes_service"
-import { PgRoutesRepository } from "adapters/outbound/postgres/routes_repository"
-import { MockRoutesRepository } from "tests/mocks/mock-repositories"
+import { jest } from "@jest/globals";
+import { createRoutesRouter } from "adapters/inbound/http/routes";
+import { RoutesService } from "core/application/routes_service";
+import { PgRoutesRepository } from "adapters/outbound/postgres/routes_repository";
+import { MockRoutesRepository } from "tests/mocks/mock-repositories";
 import {
   BASELINE_ROUTE,
   ROUTE_2,
@@ -12,7 +12,7 @@ import {
   ROUTE_4,
   ROUTE_5,
   ALL_ROUTES,
-} from "tests/fixtures/test-data"
+} from "tests/fixtures/test-data";
 
 // Mock the database
 jest.mock("infrastructure/db/db", () => ({

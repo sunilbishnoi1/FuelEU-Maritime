@@ -1,0 +1,9 @@
+Node_modules/
+package-lock.json
+.env
+dist/
+coverage/
+
+.vscode/
+
+doc2

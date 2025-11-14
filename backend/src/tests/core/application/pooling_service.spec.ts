@@ -1,13 +1,10 @@
-import { PoolingService } from "core/application/pooling_service"
+import { PoolingService } from "core/application/pooling_service";
 import {
   MockPoolingRepository,
   MockComplianceRepository,
   MockBankingRepository,
-} from "tests/mocks/mock-repositories"
-import {
-  createCompliance,
-  createBankEntry,
-} from "tests/fixtures/test-data"
+} from "tests/mocks/mock-repositories";
+import { createCompliance, createBankEntry } from "tests/fixtures/test-data";
 import { PoolMember } from "core/domain/pool_member";
 
 describe("PoolingService", () => {
@@ -85,10 +82,18 @@ describe("PoolingService", () => {
       // ship4: -400 -> covered by surplus -> cb_after = 0, surplus = 800
       // ship2: -500 -> covered by surplus -> cb_after = -300, surplus = 0
 
-      const ship1Member = members.find((m: PoolMember) => m.ship_id === "ship-1");
-      const ship3Member = members.find((m: PoolMember) => m.ship_id === "ship-3");
-      const ship4Member = members.find((m: PoolMember) => m.ship_id === "ship-4");
-      const ship2Member = members.find((m: PoolMember) => m.ship_id === "ship-2");
+      const ship1Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-1",
+      );
+      const ship3Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-3",
+      );
+      const ship4Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-4",
+      );
+      const ship2Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-2",
+      );
 
       expect(ship1Member?.cb_after).toBe(100); // Surplus reduced
       expect(ship3Member?.cb_after).toBe(200); // Surplus stays
@@ -123,7 +128,10 @@ describe("PoolingService", () => {
       await mockComplianceRepository.save(ship1);
       await mockComplianceRepository.save(ship2);
 
-      const members = await poolingService.createPool(2025, ["ship-1", "ship-2"]);
+      const members = await poolingService.createPool(2025, [
+        "ship-1",
+        "ship-2",
+      ]);
 
       const surplus = members.find((m: PoolMember) => m.ship_id === "ship-1");
       const deficit = members.find((m: PoolMember) => m.ship_id === "ship-2");
@@ -157,10 +165,15 @@ describe("PoolingService", () => {
       const banked = createBankEntry("ship-1", 2024, 200);
       await mockBankingRepository.save(banked);
 
-      const members = await poolingService.createPool(2025, ["ship-1", "ship-2"]);
+      const members = await poolingService.createPool(2025, [
+        "ship-1",
+        "ship-2",
+      ]);
 
       // Ship1 cb_before should include banked: 500 + 200 = 700
-      const ship1Member = members.find((m: PoolMember) => m.ship_id === "ship-1");
+      const ship1Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-1",
+      );
       expect(ship1Member?.cb_before).toBe(700);
     });
 
@@ -233,8 +246,14 @@ describe("PoolingService", () => {
         "ship-3",
       ]);
 
-      const totalBefore = members.reduce((sum: number, m: PoolMember) => sum + m.cb_before, 0);
-      const totalAfter = members.reduce((sum: number, m: PoolMember) => sum + (m.cb_after ?? 0), 0);
+      const totalBefore = members.reduce(
+        (sum: number, m: PoolMember) => sum + m.cb_before,
+        0,
+      );
+      const totalAfter = members.reduce(
+        (sum: number, m: PoolMember) => sum + (m.cb_after ?? 0),
+        0,
+      );
 
       expect(totalBefore).toBe(800); // 1500 - 400 - 300
       expect(totalAfter).toBe(800); // Should remain the same

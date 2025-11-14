@@ -1,8 +1,8 @@
-import { BankingService } from "core/application/banking_service"
+import { BankingService } from "core/application/banking_service";
 import {
   MockBankingRepository,
   MockComplianceRepository,
-} from "tests/mocks/mock-repositories"
+} from "tests/mocks/mock-repositories";
 import {
   COMPLIANCE_POSITIVE,
   COMPLIANCE_NEGATIVE,
@@ -11,7 +11,7 @@ import {
   BANK_ENTRY_NEGATIVE,
   createCompliance,
   createBankEntry,
-} from "tests/fixtures/test-data"
+} from "tests/fixtures/test-data";
 import { BankEntry } from "core/domain/bank_entry";
 
 describe("BankingService", () => {
@@ -142,7 +142,7 @@ describe("BankingService", () => {
         "ship-1",
         2025,
       );
-      
+
       const appliedEntry = records.find((r: BankEntry) => r.amount_gco2eq < 0);
       expect(appliedEntry).toBeDefined();
       expect(appliedEntry?.amount_gco2eq).toBe(-100000);
@@ -151,19 +151,25 @@ describe("BankingService", () => {
     it("should throw error when applying zero amount", async () => {
       await expect(
         bankingService.applyBankedSurplus("ship-1", 2025, 0),
-      ).rejects.toThrow("Invalid amount to apply or insufficient banked surplus.");
+      ).rejects.toThrow(
+        "Invalid amount to apply or insufficient banked surplus.",
+      );
     });
 
     it("should throw error when applying negative amount", async () => {
       await expect(
         bankingService.applyBankedSurplus("ship-1", 2025, -100000),
-      ).rejects.toThrow("Invalid amount to apply or insufficient banked surplus.");
+      ).rejects.toThrow(
+        "Invalid amount to apply or insufficient banked surplus.",
+      );
     });
 
     it("should throw error when applying more than available", async () => {
       await expect(
         bankingService.applyBankedSurplus("ship-1", 2025, 900000),
-      ).rejects.toThrow("Invalid amount to apply or insufficient banked surplus.");
+      ).rejects.toThrow(
+        "Invalid amount to apply or insufficient banked surplus.",
+      );
     });
 
     it("should allow applying exact total banked amount", async () => {
@@ -180,7 +186,9 @@ describe("BankingService", () => {
     it("should throw error when no surplus is banked", async () => {
       await expect(
         bankingService.applyBankedSurplus("ship-2", 2025, 100000),
-      ).rejects.toThrow("Invalid amount to apply or insufficient banked surplus.");
+      ).rejects.toThrow(
+        "Invalid amount to apply or insufficient banked surplus.",
+      );
     });
 
     it("should consider bank entries across multiple years", async () => {

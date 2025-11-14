@@ -1,8 +1,8 @@
 import express from "express";
-import { createRoutesRouter } from "../../adapters/inbound/http/routes"
-import { createComplianceRouter } from "../../adapters/inbound/http/compliance_routes"
-import { createBankingRouter } from "../../adapters/inbound/http/banking_routes"
-import { createPoolingRouter } from "../../adapters/inbound/http/pooling_routes"
+import { createRoutesRouter } from "../../adapters/inbound/http/routes";
+import { createComplianceRouter } from "../../adapters/inbound/http/compliance_routes";
+import { createBankingRouter } from "../../adapters/inbound/http/banking_routes";
+import { createPoolingRouter } from "../../adapters/inbound/http/pooling_routes";
 
 import { RoutesService } from "../../core/application/routes_service";
 import { ComplianceService } from "../../core/application/compliance_service";

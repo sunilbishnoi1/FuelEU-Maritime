@@ -1,18 +1,18 @@
-import { RoutesService } from "core/application/routes_service"
-import { ComplianceService } from "core/application/compliance_service"
-import { BankingService } from "core/application/banking_service"
-import { PoolingService } from "core/application/pooling_service"
+import { RoutesService } from "core/application/routes_service";
+import { ComplianceService } from "core/application/compliance_service";
+import { BankingService } from "core/application/banking_service";
+import { PoolingService } from "core/application/pooling_service";
 import {
   MockRoutesRepository,
   MockComplianceRepository,
   MockBankingRepository,
   MockPoolingRepository,
-} from "tests/mocks/mock-repositories"
+} from "tests/mocks/mock-repositories";
 import {
   createRoute,
   createCompliance,
   createBankEntry,
-} from "tests/fixtures/test-data"
+} from "tests/fixtures/test-data";
 import { BankEntry } from "core/domain/bank_entry";
 import { Compliance } from "core/domain/compliance";
 import { PoolMember } from "core/domain/pool_member";
@@ -167,10 +167,7 @@ describe("Edge Cases Tests", () => {
       const largeCompliance = createCompliance("ship-1", 2025, 1e15);
       await mockComplianceRepository.save(largeCompliance);
 
-      const result = await bankingService.bankComplianceBalance(
-        "ship-1",
-        2025,
-      );
+      const result = await bankingService.bankComplianceBalance("ship-1", 2025);
 
       expect(result?.amount_gco2eq).toBe(1e15);
     });
@@ -210,7 +207,9 @@ describe("Edge Cases Tests", () => {
       const records = await bankingService.getBankRecords("ship-1", 2025);
 
       expect(records).toHaveLength(4); // 2 original + 2 applications
-      const applications = records.filter((r: BankEntry) => r.amount_gco2eq < 0);
+      const applications = records.filter(
+        (r: BankEntry) => r.amount_gco2eq < 0,
+      );
       expect(applications).toHaveLength(2);
     });
   });
@@ -264,12 +263,19 @@ describe("Edge Cases Tests", () => {
         await mockComplianceRepository.save(ship);
       }
 
-      const allShipIds = ["ship-surplus", ...deficitShips.map((s) => s.ship_id)];
+      const allShipIds = [
+        "ship-surplus",
+        ...deficitShips.map((s) => s.ship_id),
+      ];
       const members = await poolingService.createPool(2025, allShipIds);
 
       // All small deficits should be covered
-      const deficitMembers = members.filter((m: PoolMember) => m.ship_id.startsWith("ship-deficit"));
-      expect(deficitMembers.every((m: PoolMember) => m.cb_after === 0)).toBe(true);
+      const deficitMembers = members.filter((m: PoolMember) =>
+        m.ship_id.startsWith("ship-deficit"),
+      );
+      expect(deficitMembers.every((m: PoolMember) => m.cb_after === 0)).toBe(
+        true,
+      );
     });
 
     it("should handle pool with many surpluses and few deficits", async () => {
@@ -291,7 +297,10 @@ describe("Edge Cases Tests", () => {
       );
 
       // Total: 100 + 200 + 150 - 50 - 100 = 300
-      const totalAfter = members.reduce((sum: number, m: PoolMember) => sum + (m.cb_after ?? 0), 0);
+      const totalAfter = members.reduce(
+        (sum: number, m: PoolMember) => sum + (m.cb_after ?? 0),
+        0,
+      );
       expect(totalAfter).toBe(300);
     });
 
@@ -307,7 +316,10 @@ describe("Edge Cases Tests", () => {
         "ship-2",
       ]);
 
-      const totalAfter = members.reduce((sum: number, m: PoolMember) => sum + (m.cb_after ?? 0), 0);
+      const totalAfter = members.reduce(
+        (sum: number, m: PoolMember) => sum + (m.cb_after ?? 0),
+        0,
+      );
       expect(totalAfter).toBe(0);
 
       const surplus = members.find((m: PoolMember) => m.ship_id === "ship-1");
@@ -332,8 +344,14 @@ describe("Edge Cases Tests", () => {
         "ship-3",
       ]);
 
-      const totalBefore = members.reduce((sum: number, m: PoolMember) => sum + m.cb_before, 0);
-      const totalAfter = members.reduce((sum: number, m: PoolMember) => sum + (m.cb_after ?? 0), 0);
+      const totalBefore = members.reduce(
+        (sum: number, m: PoolMember) => sum + m.cb_before,
+        0,
+      );
+      const totalAfter = members.reduce(
+        (sum: number, m: PoolMember) => sum + (m.cb_after ?? 0),
+        0,
+      );
 
       expect(totalBefore).toBeCloseTo(totalAfter, 10);
     });
@@ -355,11 +373,15 @@ describe("Edge Cases Tests", () => {
       ]);
 
       // Ship 1 should have cb_before = 1000 + 300 = 1300
-      const ship1Member = members.find((m: PoolMember) => m.ship_id === "ship-1");
+      const ship1Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-1",
+      );
       expect(ship1Member?.cb_before).toBe(1300);
 
       // Ship 2 should be fully covered
-      const ship2Member = members.find((m: PoolMember) => m.ship_id === "ship-2");
+      const ship2Member = members.find(
+        (m: PoolMember) => m.ship_id === "ship-2",
+      );
       expect(ship2Member?.cb_after).toBe(0);
     });
 
@@ -374,8 +396,14 @@ describe("Edge Cases Tests", () => {
 
       const members = await poolingService.createPool(2025, shipIds);
 
-      const totalBefore = members.reduce((sum: number, m: PoolMember) => sum + m.cb_before, 0);
-      const totalAfter = members.reduce((sum: number, m: PoolMember) => sum + (m.cb_after ?? 0), 0);
+      const totalBefore = members.reduce(
+        (sum: number, m: PoolMember) => sum + m.cb_before,
+        0,
+      );
+      const totalAfter = members.reduce(
+        (sum: number, m: PoolMember) => sum + (m.cb_after ?? 0),
+        0,
+      );
 
       expect(totalAfter).toBeCloseTo(totalBefore, 5);
     });
@@ -413,10 +441,7 @@ describe("Edge Cases Tests", () => {
       await mockComplianceRepository.save(compliance);
 
       // Bank the compliance
-      const banked = await bankingService.bankComplianceBalance(
-        "ship-1",
-        2025,
-      );
+      const banked = await bankingService.bankComplianceBalance("ship-1", 2025);
       expect(banked?.amount_gco2eq).toBe(1000);
 
       // Check adjusted CB

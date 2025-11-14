@@ -1,7 +1,5 @@
-import { RoutesService } from "core/application/routes_service"
-import {
-  MockRoutesRepository,
-} from "tests/mocks/mock-repositories"
+import { RoutesService } from "core/application/routes_service";
+import { MockRoutesRepository } from "tests/mocks/mock-repositories";
 import {
   BASELINE_ROUTE,
   ROUTE_2,
@@ -10,7 +8,7 @@ import {
   ROUTE_5,
   ALL_ROUTES,
   createRoute,
-} from "tests/fixtures/test-data"
+} from "tests/fixtures/test-data";
 import type { Route } from "core/domain/route";
 
 describe("RoutesService", () => {
@@ -85,15 +83,19 @@ describe("RoutesService", () => {
       const comparison = await routesService.getComparison();
 
       expect(comparison).toHaveLength(4); // Non-baseline routes
-      
+
       // Check ROUTE_2 (95.0 vs baseline 89.3368)
-      const route2Comparison = comparison.find((r: Route) => r.id === "route-2");
+      const route2Comparison = comparison.find(
+        (r: Route) => r.id === "route-2",
+      );
       expect(route2Comparison).toBeDefined();
       expect(route2Comparison?.compliant).toBe(false); // 95 > 89.3368
       expect(route2Comparison?.percentDiff).toBeCloseTo(6.36, 1);
 
       // Check ROUTE_3 (85.0 vs baseline 89.3368)
-      const route3Comparison = comparison.find((r: Route) => r.id === "route-3");
+      const route3Comparison = comparison.find(
+        (r: Route) => r.id === "route-3",
+      );
       expect(route3Comparison).toBeDefined();
       expect(route3Comparison?.compliant).toBe(true); // 85 < 89.3368
       expect(route3Comparison?.percentDiff).toBeCloseTo(-4.81, 1);
@@ -129,7 +131,11 @@ describe("RoutesService", () => {
       const route50PercentHigher = createRoute("route-150", 150, false);
       const route50PercentLower = createRoute("route-50", 50, false);
 
-      mockRoutesRepository.setRoutes([baseline, route50PercentHigher, route50PercentLower]);
+      mockRoutesRepository.setRoutes([
+        baseline,
+        route50PercentHigher,
+        route50PercentLower,
+      ]);
       await mockRoutesRepository.setBaseline("base");
 
       const comparison = await routesService.getComparison();

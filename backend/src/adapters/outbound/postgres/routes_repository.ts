@@ -23,6 +23,14 @@ export class PgRoutesRepository implements RoutesRepository {
     return result.rows[0] || null;
   }
 
+  async findByRouteId(routeId: string): Promise<Route | null> {
+    const result = await this.pool.query<Route>(
+      "SELECT * FROM routes WHERE route_id = $1",
+      [routeId],
+    );
+    return result.rows[0] || null;
+  }
+
   async setBaseline(id: string): Promise<Route | null> {
     // Start a transaction
     const client = await this.pool.connect();
@@ -34,7 +42,7 @@ export class PgRoutesRepository implements RoutesRepository {
         "UPDATE routes SET is_baseline = FALSE WHERE is_baseline = TRUE",
       );
 
-      // Set new baseline
+      // Set new baseline using the UUID
       const result = await client.query<Route>(
         "UPDATE routes SET is_baseline = TRUE WHERE id = $1 RETURNING *",
         [id],

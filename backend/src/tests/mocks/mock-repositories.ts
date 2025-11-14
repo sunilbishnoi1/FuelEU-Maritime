@@ -1,12 +1,12 @@
-import { type RoutesRepository } from "../../core/ports/routes_repository.js"
-import { type ComplianceRepository } from "../../core/ports/compliance_repository.js"
-import { type BankingRepository } from "../../core/ports/banking_repository.js"
-import { type PoolingRepository } from "../../core/ports/pooling_repository.js"
-import { type Route } from "../../core/domain/route.js"
-import { Compliance } from "../../core/domain/compliance.js"
-import { BankEntry } from "../../core/domain/bank_entry.js"
-import { Pool } from "../../core/domain/pool.js"
-import { PoolMember } from "../../core/domain/pool_member.js"
+import { type RoutesRepository } from "../../core/ports/routes_repository.js";
+import { type ComplianceRepository } from "../../core/ports/compliance_repository.js";
+import { type BankingRepository } from "../../core/ports/banking_repository.js";
+import { type PoolingRepository } from "../../core/ports/pooling_repository.js";
+import { type Route } from "../../core/domain/route.js";
+import { Compliance } from "../../core/domain/compliance.js";
+import { BankEntry } from "../../core/domain/bank_entry.js";
+import { Pool } from "../../core/domain/pool.js";
+import { PoolMember } from "../../core/domain/pool_member.js";
 
 export class MockRoutesRepository implements RoutesRepository {
   private routes: Route[] = [];
@@ -23,6 +23,10 @@ export class MockRoutesRepository implements RoutesRepository {
   async findById(id: string): Promise<Route | null> {
     const route = this.routes.find((r) => r.id === id);
     return Promise.resolve(route || null);
+  }
+
+  async findByRouteId(routeId: string): Promise<Route | null> {
+    return this.findById(routeId);
   }
 
   async setBaseline(id: string): Promise<Route | null> {

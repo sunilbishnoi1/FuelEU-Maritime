@@ -1,6 +1,6 @@
-import { type Route } from "../../core/domain/route"
-import { Compliance } from "../../core/domain/compliance"
-import { BankEntry } from "../../core/domain/bank_entry"
+import { type Route } from "../../core/domain/route";
+import { Compliance } from "../../core/domain/compliance";
+import { BankEntry } from "../../core/domain/bank_entry";
 
 export const BASELINE_ROUTE: Route = {
   id: "route-1",

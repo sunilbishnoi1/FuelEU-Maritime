@@ -1,9 +1,9 @@
-import { ComplianceService } from "core/application/compliance_service"
+import { ComplianceService } from "core/application/compliance_service";
 import {
   MockComplianceRepository,
   MockRoutesRepository,
   MockBankingRepository,
-} from "tests/mocks/mock-repositories"
+} from "tests/mocks/mock-repositories";
 import {
   BASELINE_ROUTE,
   ROUTE_2,
@@ -13,7 +13,7 @@ import {
   BANK_ENTRY_NEGATIVE,
   createCompliance,
   createBankEntry,
-} from "tests/fixtures/test-data"
+} from "tests/fixtures/test-data";
 
 describe("ComplianceService", () => {
   let complianceService: ComplianceService;
@@ -40,7 +40,10 @@ describe("ComplianceService", () => {
     it("should return cached compliance if it exists", async () => {
       await mockComplianceRepository.save(COMPLIANCE_POSITIVE);
 
-      const result = await complianceService.getComplianceBalance("ship-1", 2025);
+      const result = await complianceService.getComplianceBalance(
+        "ship-1",
+        2025,
+      );
 
       expect(result).not.toBeNull();
       expect(result?.cb_gco2eq).toBe(1000000);
@@ -49,14 +52,18 @@ describe("ComplianceService", () => {
     it("should compute and return new compliance balance if not cached", async () => {
       mockRoutesRepository.setRoutes([BASELINE_ROUTE]);
 
-      const result = await complianceService.getComplianceBalance("route-1", 2025);
+      const result = await complianceService.getComplianceBalance(
+        "route-1",
+        2025,
+      );
 
       expect(result).not.toBeNull();
       expect(result?.ship_id).toBe("route-1");
       expect(result?.year).toBe(2025);
 
       // Expected CB = (89.3368 - 89.3368) * 41000000 = 0
-      const expectedCb = (targetIntensity - BASELINE_ROUTE.ghg_intensity) * energyInScope;
+      const expectedCb =
+        (targetIntensity - BASELINE_ROUTE.ghg_intensity) * energyInScope;
       expect(result?.cb_gco2eq).toBeCloseTo(expectedCb, 0);
     });
 
@@ -67,7 +74,10 @@ describe("ComplianceService", () => {
       };
       mockRoutesRepository.setRoutes([highIntensityRoute]);
 
-      const result = await complianceService.getComplianceBalance("route-2", 2025);
+      const result = await complianceService.getComplianceBalance(
+        "route-2",
+        2025,
+      );
 
       // Expected CB = (89.3368 - 95.0) * 41000000 = negative
       const expectedCb = (targetIntensity - 95.0) * energyInScope;
@@ -78,9 +88,15 @@ describe("ComplianceService", () => {
     it("should save computed compliance to repository", async () => {
       mockRoutesRepository.setRoutes([BASELINE_ROUTE]);
 
-      const result = await complianceService.getComplianceBalance("route-1", 2025);
+      const result = await complianceService.getComplianceBalance(
+        "route-1",
+        2025,
+      );
 
-      const saved = await mockComplianceRepository.findByShipIdAndYear("route-1", 2025);
+      const saved = await mockComplianceRepository.findByShipIdAndYear(
+        "route-1",
+        2025,
+      );
       expect(saved).not.toBeNull();
       expect(saved?.cb_gco2eq).toBe(result?.cb_gco2eq);
     });
@@ -88,7 +104,10 @@ describe("ComplianceService", () => {
     it("should return null if route not found", async () => {
       mockRoutesRepository.setRoutes([]);
 
-      const result = await complianceService.getComplianceBalance("non-existent", 2025);
+      const result = await complianceService.getComplianceBalance(
+        "non-existent",
+        2025,
+      );
 
       expect(result).toBeNull();
     });

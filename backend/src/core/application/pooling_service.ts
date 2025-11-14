@@ -42,12 +42,20 @@ export class PoolingService {
     // Sort members desc by CB for greedy allocation
     membersWithCb.sort((a, b) => b.cb - a.cb);
 
-    const membersWithFinalCb: { shipId: string; cbBefore: number; cbAfter: number }[] = [];
+    const membersWithFinalCb: {
+      shipId: string;
+      cbBefore: number;
+      cbAfter: number;
+    }[] = [];
     let totalSurplusAvailable = 0;
 
     // First pass: Calculate initial cbBefore and accumulate total surplus
     for (const member of membersWithCb) {
-      membersWithFinalCb.push({ shipId: member.shipId, cbBefore: member.cb, cbAfter: member.cb });
+      membersWithFinalCb.push({
+        shipId: member.shipId,
+        cbBefore: member.cb,
+        cbAfter: member.cb,
+      });
       if (member.cb > 0) {
         totalSurplusAvailable += member.cb;
       }
@@ -55,7 +63,8 @@ export class PoolingService {
 
     // Second pass: Distribute surplus to cover deficits
     for (const member of membersWithFinalCb) {
-      if (member.cbBefore < 0) { // This is a deficit member
+      if (member.cbBefore < 0) {
+        // This is a deficit member
         const deficitToCover = Math.abs(member.cbBefore);
         if (totalSurplusAvailable >= deficitToCover) {
           member.cbAfter = 0; // Deficit fully covered
@@ -72,7 +81,9 @@ export class PoolingService {
     // This remaining surplus needs to be distributed back to the original surplus members.
     // The reduction in surplus (initial total surplus - remaining total surplus) must be applied to the surplus members.
 
-    const initialTotalSurplus = membersWithCb.filter(m => m.cb > 0).reduce((sum, m) => sum + m.cb, 0);
+    const initialTotalSurplus = membersWithCb
+      .filter((m) => m.cb > 0)
+      .reduce((sum, m) => sum + m.cb, 0);
     let surplusUsed = initialTotalSurplus - totalSurplusAvailable;
 
     if (surplusUsed > 0) {
