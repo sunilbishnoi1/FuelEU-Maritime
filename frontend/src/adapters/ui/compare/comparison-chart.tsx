@@ -5,11 +5,13 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
+  BarController,
+  LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
-  LineElement, // Import LineElement
-  PointElement, // Import PointElement
+  PointElement,
 } from 'chart.js';
 import type { Route } from '../../../core/domain/entities';
 import { Card } from '../../../shared/components/card';
@@ -18,11 +20,13 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  BarController,
+  LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
-  LineElement, // Register LineElement
-  PointElement, // Register PointElement
+  PointElement
 );
 
 interface ComparisonChartProps {

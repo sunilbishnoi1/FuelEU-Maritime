@@ -3,13 +3,19 @@ import { config } from "dotenv";
 
 config();
 
-const isProduction = process.env.NODE_ENV === "production";
+// Determine if we need SSL based on the database URL
+// Render and other cloud databases require SSL even in development
+const databaseUrl = process.env.DATABASE_URL || "";
+const needsSSL =
+  databaseUrl.includes("render.com") ||
+  databaseUrl.includes("amazonaws.com") ||
+  (!databaseUrl.includes("localhost") && databaseUrl.length > 0);
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: isProduction
-    ? { rejectUnauthorized: false } // Render/Postgres cloud requirement
-    : false,                        // Local development uses no SSL
+  ssl: needsSSL
+    ? { rejectUnauthorized: false } // Cloud databases require SSL
+    : false, // Local databases don't need SSL
 });
 
 export default pool;

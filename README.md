@@ -136,7 +136,11 @@ NOTE: test cases for Frontend are not implemented yet
 ## Screenshot and Sample Requests/Responses
 
 ### Compare page
-![Dashboard Screenshot](./docs/screenshot2.png)![Dashboard Screenshot](./docs/screenshot3.png)
+![Dashboard Screenshot](./docs/screenshot2.png)
+
+### Banking page
+
+![Dashboard Screenshot](./docs/screenshot3.png)
 
 ### Sample API Request
 
