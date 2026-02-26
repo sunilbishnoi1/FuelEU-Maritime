@@ -53,31 +53,31 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   });
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
-      <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-secondary-900">
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="p-6 border-b border-slate-200">
+        <h3 className="text-lg font-semibold text-slate-900">
           Route-by-Route Comparison
         </h3>
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="bg-secondary-50 border-b border-border">
-            <TableHead className="text-secondary-900 font-semibold">
+          <TableRow className="bg-slate-50 border-b border-slate-200">
+            <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
               Route ID
             </TableHead>
-            <TableHead className="text-secondary-900 font-semibold">
+            <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
               Year
             </TableHead>
-            <TableHead className="text-secondary-900 font-semibold">
+            <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
               Baseline GHG
             </TableHead>
-            <TableHead className="text-secondary-900 font-semibold">
+            <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
               Optimized GHG
             </TableHead>
-            <TableHead className="text-secondary-900 font-semibold">
+            <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
               % Change
             </TableHead>
-            <TableHead className="text-secondary-900 font-semibold">
+            <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
               Compliant
             </TableHead>
           </TableRow>
@@ -87,7 +87,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
             <TableRow>
               <TableCell
                 colSpan={6}
-                className="text-center text-muted-foreground py-6"
+                className="text-center text-slate-500 py-6"
               >
                 No comparison routes available.
               </TableCell>
@@ -96,31 +96,38 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
             combinedRoutes.map((route, idx) => (
               <TableRow
                 key={route.id}
-                className={`border-b border-border hover:bg-primary-50/50 transition-colors ${
-                  idx % 2 === 0 ? "bg-card" : "bg-secondary-50/30"
+                className={`border-b border-slate-100 hover:bg-slate-50/80 transition-colors ${
+                  idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"
                 }`}
               >
-                <TableCell className="font-semibold text-primary-700">
+                <TableCell className="font-semibold text-slate-800">
                   {route.routeId}
                 </TableCell>
-                <TableCell className="text-secondary-700">
+                <TableCell className="text-slate-600">
                   {route.year}
                 </TableCell>
-                <TableCell className="text-secondary-700 font-mono text-sm">
+                <TableCell className="text-slate-600 font-mono text-sm tabular-nums">
                   {route.baselineGhgValue !== null
                     ? route.baselineGhgValue.toFixed(2)
                     : "N/A"}
                 </TableCell>
-                <TableCell className="text-secondary-700 font-mono text-sm">
+                <TableCell className="text-slate-600 font-mono text-sm tabular-nums">
                   {route.ghgIntensity.toFixed(2)}
                 </TableCell>
                 <TableCell
-                  className={`font-semibold font-mono text-sm ${route.percentDiff < 0 ? "text-primary-700" : "text-destructive"}`}
+                  className={`font-semibold font-mono text-sm tabular-nums ${route.percentDiff < 0 ? "text-emerald-600" : "text-rose-600"}`}
                 >
-                  {route.percentDiff.toFixed(2)}%
+                  {route.percentDiff > 0 ? "+" : ""}{route.percentDiff.toFixed(2)}%
                 </TableCell>
                 <TableCell>
-                  <Badge variant={route.compliant ? "success" : "error"}>
+                  <Badge 
+                    variant={route.compliant ? "success" : "error"}
+                    className={
+                      route.compliant
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-rose-50 text-rose-700 border-rose-200"
+                    }
+                  >
                     {route.compliant ? "Compliant" : "Non-Compliant"}
                   </Badge>
                 </TableCell>

@@ -3,17 +3,22 @@ import { Ship } from 'lucide-react';
 
 const Header: React.FC = () => {
   return (
-    <header className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-700 shadow-lg">
-      <div className="container mx-auto px-6 max-w-7xl">
-        <div className="flex items-center justify-center py-5">
+    <header className="bg-slate-900 text-white border-b border-slate-800">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-[1400px]">
+        <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <div className="bg-white/10 backdrop-blur-sm p-2.5 rounded-lg">
-              <Ship className="w-7 h-7 text-white" />
+            <div className="bg-blue-600/20 p-2 rounded-md border border-blue-500/30">
+              <Ship className="w-6 h-6 text-blue-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">FuelEU Maritime</h1>
-              <p className="text-sm text-primary-100">Compliance & Optimization Platform</p>
+              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                FuelEU Maritime
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Platform</span>
+              </h1>
             </div>
+          </div>
+          <div className="text-sm font-medium text-slate-400 hidden sm:block">
+            Compliance & Optimization
           </div>
         </div>
       </div>

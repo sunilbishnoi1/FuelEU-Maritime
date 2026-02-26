@@ -52,14 +52,20 @@ export class PgBankingRepository implements BankingRepository {
       await client.query("BEGIN");
 
       // Lock and sum all bank entries for this ship/year within the transaction
-      const surplusResult = await client.query<{ sum: string | null }>(
-        `SELECT COALESCE(SUM(amount_gco2eq), 0) as sum
+      const surplusResult = await client.query<{
+        amount_gco2eq: string | number;
+      }>(
+        `SELECT amount_gco2eq
          FROM bank_entries
          WHERE ship_id = $1 AND year <= $2
          FOR UPDATE`,
         [shipId, year],
       );
-      const availableSurplus = parseFloat(surplusResult.rows[0]?.sum ?? "0");
+
+      const availableSurplus = surplusResult.rows.reduce(
+        (sum, row) => sum + parseFloat(String(row.amount_gco2eq)),
+        0,
+      );
       const amountToApply = Math.abs(entry.amount_gco2eq);
 
       if (amountToApply > availableSurplus) {

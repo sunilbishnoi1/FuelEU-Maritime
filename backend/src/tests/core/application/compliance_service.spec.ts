@@ -13,7 +13,10 @@ import {
   createBankEntry,
   createRoute,
 } from "tests/fixtures/test-data";
-import { TARGET_INTENSITY_2025, ENERGY_CONVERSION_FACTOR } from "shared/constants";
+import {
+  TARGET_INTENSITY_2025,
+  ENERGY_CONVERSION_FACTOR,
+} from "shared/constants";
 
 describe("ComplianceService", () => {
   let complianceService: ComplianceService;
@@ -61,7 +64,8 @@ describe("ComplianceService", () => {
       expect(result?.year).toBe(2025);
 
       // C1: Using route.fuel_consumption (5000) instead of hardcoded 1000
-      const expectedEnergy = BASELINE_ROUTE.fuel_consumption * ENERGY_CONVERSION_FACTOR;
+      const expectedEnergy =
+        BASELINE_ROUTE.fuel_consumption * ENERGY_CONVERSION_FACTOR;
       const expectedCb =
         (TARGET_INTENSITY_2025 - BASELINE_ROUTE.ghg_intensity) * expectedEnergy;
       expect(result?.cb_gco2eq).toBeCloseTo(expectedCb, 0);
@@ -80,7 +84,8 @@ describe("ComplianceService", () => {
       );
 
       // C1: Using route.fuel_consumption (4800) instead of hardcoded 1000
-      const expectedEnergy = highIntensityRoute.fuel_consumption * ENERGY_CONVERSION_FACTOR;
+      const expectedEnergy =
+        highIntensityRoute.fuel_consumption * ENERGY_CONVERSION_FACTOR;
       const expectedCb = (TARGET_INTENSITY_2025 - 95.0) * expectedEnergy;
       expect(result?.cb_gco2eq).toBeCloseTo(expectedCb, 0);
       expect(result?.cb_gco2eq).toBeLessThan(0); // Deficit
@@ -101,10 +106,20 @@ describe("ComplianceService", () => {
     });
 
     it("should match manual calculation", async () => {
-      const route = createRoute("manual", 91.0, false, "Container", "HFO", 3000);
+      const route = createRoute(
+        "manual",
+        91.0,
+        false,
+        "Container",
+        "HFO",
+        3000,
+      );
       mockRoutesRepository.setRoutes([route]);
 
-      const result = await complianceService.getComplianceBalance("manual", 2025);
+      const result = await complianceService.getComplianceBalance(
+        "manual",
+        2025,
+      );
 
       // Manual: (89.3368 - 91.0) * 3000 * 41000 = -1.6632 * 123000000 = -204573600
       const expectedCb = (89.3368 - 91.0) * 3000 * 41000;
@@ -240,12 +255,13 @@ describe("ComplianceService", () => {
 
       mockRoutesRepository.setRoutes([BASELINE_ROUTE, ROUTE_2]);
 
-      const results = await complianceService.getAdjustedComplianceBalanceForAllShips(2025);
+      const results =
+        await complianceService.getAdjustedComplianceBalanceForAllShips(2025);
 
       expect(results).toHaveLength(2);
-      const ship1Result = results.find(r => r.shipId === "ship-001");
+      const ship1Result = results.find((r) => r.shipId === "ship-001");
       expect(ship1Result?.adjustedCb).toBe(600000); // 500000 + 100000
-      const ship2Result = results.find(r => r.shipId === "ship-002");
+      const ship2Result = results.find((r) => r.shipId === "ship-002");
       expect(ship2Result?.adjustedCb).toBe(-200000); // -200000 + 0
     });
   });

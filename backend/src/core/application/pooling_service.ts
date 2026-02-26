@@ -113,7 +113,10 @@ export class PoolingService {
 
     // C3: Persist pool + all members atomically in a single transaction
     const newPool = new Pool(poolId, year, new Date());
-    await this.poolingRepository.savePoolWithMembers(newPool, finalPoolMembersList);
+    await this.poolingRepository.savePoolWithMembers(
+      newPool,
+      finalPoolMembersList,
+    );
 
     return finalPoolMembersList;
   }

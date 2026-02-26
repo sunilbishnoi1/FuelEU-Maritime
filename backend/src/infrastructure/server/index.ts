@@ -17,6 +17,15 @@ import { PgBankingRepository } from "../../adapters/outbound/postgres/banking_re
 import { PgPoolingRepository } from "../../adapters/outbound/postgres/pooling_repository.js";
 import { PostgresShipRepository } from "../../adapters/outbound/postgres/ship_repository.js";
 
+import {
+  MockRoutesRepository,
+  MockComplianceRepository,
+  MockBankingRepository,
+  MockPoolingRepository,
+  MockShipRepository,
+} from "../../tests/mocks/mock-repositories.js";
+import { ALL_ROUTES } from "../../tests/fixtures/test-data.js";
+
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -46,12 +55,33 @@ process.on("unhandledRejection", (reason: unknown) => {
 });
 
 async function startServer() {
-  // All repositories use constructor-injected DB pool (M1)
-  const routesRepository = new PgRoutesRepository(pool);
-  const complianceRepository = new PgComplianceRepository(pool);
-  const bankingRepository = new PgBankingRepository(pool);
-  const poolingRepository = new PgPoolingRepository(pool);
-  const shipRepository = new PostgresShipRepository(pool);
+  const useMocks =
+    process.env.USE_MOCKS === "true" || !process.env.DATABASE_URL;
+
+  let routesRepository;
+  let complianceRepository;
+  let bankingRepository;
+  let poolingRepository;
+  let shipRepository;
+
+  if (useMocks) {
+    console.log("🚀 Starting with In-Memory Mocks (No Database detected)");
+    const mockRoutes = new MockRoutesRepository();
+    mockRoutes.setRoutes(ALL_ROUTES);
+
+    routesRepository = mockRoutes;
+    complianceRepository = new MockComplianceRepository();
+    bankingRepository = new MockBankingRepository();
+    poolingRepository = new MockPoolingRepository();
+    shipRepository = new MockShipRepository();
+  } else {
+    console.log("🗄️  Starting with PostgreSQL Database");
+    routesRepository = new PgRoutesRepository(pool);
+    complianceRepository = new PgComplianceRepository(pool);
+    bankingRepository = new PgBankingRepository(pool);
+    poolingRepository = new PgPoolingRepository(pool);
+    shipRepository = new PostgresShipRepository(pool);
+  }
 
   const routesService = new RoutesService(routesRepository);
   const bankingService = new BankingService(

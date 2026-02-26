@@ -105,7 +105,10 @@ describe("RoutesService", () => {
 
     it("should return empty array when no baseline is set", async () => {
       // Set routes with no baseline marked
-      const routesWithNoBaseline = ALL_ROUTES.map(r => ({ ...r, is_baseline: false }));
+      const routesWithNoBaseline = ALL_ROUTES.map((r) => ({
+        ...r,
+        is_baseline: false,
+      }));
       mockRoutesRepository.setRoutes(routesWithNoBaseline);
 
       const comparison = await routesService.getComparison();
@@ -124,13 +127,19 @@ describe("RoutesService", () => {
 
       const comparison = await routesService.getComparison();
 
-      const equalToTarget = comparison.find((r: ComparisonDto) => r.id === "route-2");
+      const equalToTarget = comparison.find(
+        (r: ComparisonDto) => r.id === "route-2",
+      );
       expect(equalToTarget?.compliant).toBe(true); // Exactly at target
 
-      const belowTarget = comparison.find((r: ComparisonDto) => r.id === "route-3");
+      const belowTarget = comparison.find(
+        (r: ComparisonDto) => r.id === "route-3",
+      );
       expect(belowTarget?.compliant).toBe(true); // Below target
 
-      const aboveTarget = comparison.find((r: ComparisonDto) => r.id === "route-4");
+      const aboveTarget = comparison.find(
+        (r: ComparisonDto) => r.id === "route-4",
+      );
       expect(aboveTarget?.compliant).toBe(false); // Above target
     });
 
@@ -148,7 +157,9 @@ describe("RoutesService", () => {
 
       const comparison = await routesService.getComparison();
 
-      const higher = comparison.find((r: ComparisonDto) => r.id === "route-150");
+      const higher = comparison.find(
+        (r: ComparisonDto) => r.id === "route-150",
+      );
       expect(higher?.percentDiff).toBe(50);
       // H1: compliant flag against TARGET (89.3368), not baseline (100)
       expect(higher?.compliant).toBe(false); // 150 > 89.3368

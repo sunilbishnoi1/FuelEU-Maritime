@@ -26,9 +26,7 @@ const generateYears = (startYear: number, endYear: number): number[] => {
 };
 
 const BankingPage: React.FC = () => {
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear(),
-  );
+  const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [shipId, setShipId] = useState<string>("");
   const [availableShips, setAvailableShips] = useState<AdjustedCompliance[]>(
     [],
@@ -43,6 +41,7 @@ const BankingPage: React.FC = () => {
 
   // Fetch available ships for the year
   const fetchShips = useCallback(async (year: number) => {
+    setLoading(true);
     try {
       const ships = await fetchAdjustedComplianceBalanceUseCase.execute(year);
       setAvailableShips(ships);
@@ -58,6 +57,7 @@ const BankingPage: React.FC = () => {
     } catch {
       // If we can't fetch ships, keep the list empty
       setAvailableShips([]);
+      setShipId("");
     }
   }, []);
 
@@ -125,7 +125,8 @@ const BankingPage: React.FC = () => {
       // Refetch compliance data after banking to get actual updated values
       await fetchComplianceData(shipId, selectedYear);
     } catch (err) {
-      setError("Failed to bank surplus.");
+      const message = err instanceof Error ? err.message : "Failed to bank surplus.";
+      setError(message);
       console.error(err);
       setLoading(false);
     }
@@ -139,7 +140,8 @@ const BankingPage: React.FC = () => {
       // Refetch compliance data after applying to get actual values
       await fetchComplianceData(shipId, selectedYear);
     } catch (err) {
-      setError("Failed to apply banked credit.");
+      const message = err instanceof Error ? err.message : "Failed to apply banked credit.";
+      setError(message);
       console.error(err);
       setLoading(false);
     }
@@ -164,13 +166,15 @@ const BankingPage: React.FC = () => {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
-          Banking Overview
-        </h1>
-        <p className="text-secondary-600">
-          Manage compliance balance banking and credits
-        </p>
+      <div className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">
+            Banking Overview
+          </h1>
+          <p className="text-slate-500">
+            Manage compliance balance banking and credits
+          </p>
+        </div>
       </div>
 
       {error && (
@@ -202,10 +206,10 @@ const BankingPage: React.FC = () => {
           onYearChange={setSelectedYear}
           availableYears={availableYears}
         />
-        <div className="p-6 rounded-lg shadow-sm bg-card border border-border">
+        <div className="p-6 rounded-xl shadow-sm bg-white border border-slate-200">
           <label
             htmlFor="ship-select"
-            className="block text-sm font-semibold text-secondary-900 mb-2"
+            className="block text-sm font-medium text-slate-700 mb-2"
           >
             Select Ship
           </label>

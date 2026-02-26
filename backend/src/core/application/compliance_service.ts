@@ -20,7 +20,7 @@ export class ComplianceService {
     private routesRepository: RoutesRepository,
     private bankingRepository: BankingRepository,
     private shipRepository: IShipRepository,
-  ) { }
+  ) {}
 
   async getComplianceBalance(
     shipId: string,
@@ -96,11 +96,16 @@ export class ComplianceService {
 
     for (const ship of allShips) {
       try {
-        const adjustedCb = await this.getAdjustedComplianceBalance(ship.id, year);
+        const adjustedCb = await this.getAdjustedComplianceBalance(
+          ship.id,
+          year,
+        );
         adjustedBalances.push({ shipId: ship.id, adjustedCb });
       } catch (error) {
         // Skip ships whose route data is incomplete/invalid
-        console.warn(`Skipping ship ${ship.id}: ${error instanceof Error ? error.message : error}`);
+        console.warn(
+          `Skipping ship ${ship.id}: ${error instanceof Error ? error.message : error}`,
+        );
         adjustedBalances.push({ shipId: ship.id, adjustedCb: null });
       }
     }

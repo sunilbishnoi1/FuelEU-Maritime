@@ -152,11 +152,7 @@ export function createBankEntry(
   return new BankEntry(`bank-${shipId}`, shipId, year, amount);
 }
 
-export function createShip(
-  id: string,
-  routeId: string,
-  name?: string,
-): Ship {
+export function createShip(id: string, routeId: string, name?: string): Ship {
   return {
     id,
     name: name ?? `Ship ${id}`,

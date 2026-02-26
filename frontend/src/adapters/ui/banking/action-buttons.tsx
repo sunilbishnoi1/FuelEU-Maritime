@@ -39,7 +39,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
 
   return (
-    <div className="bg-card p-6 rounded-lg border border-border shadow-sm mt-6 flex flex-col sm:flex-row gap-4">
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-6 flex flex-col sm:flex-row gap-4">
       <Button
         onClick={onBankSurplus}
         disabled={currentCb <= 0}

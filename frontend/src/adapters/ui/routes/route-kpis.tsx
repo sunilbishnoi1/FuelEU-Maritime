@@ -63,50 +63,44 @@ export const RouteKPIs: React.FC<RouteKPIsProps> = ({ routes, loading }) => {
         const Icon = kpi.icon;
         const bgColor =
           kpi.color === "primary"
-            ? "bg-primary-50"
+            ? "bg-blue-50"
             : kpi.color === "secondary"
-              ? "bg-secondary-50"
-              : "bg-accent-50";
+              ? "bg-slate-50"
+              : "bg-emerald-50";
         const iconColor =
           kpi.color === "primary"
-            ? "text-primary-600"
+            ? "text-blue-600"
             : kpi.color === "secondary"
-              ? "text-secondary-600"
-              : "text-accent-600";
-        const textColor =
-          kpi.color === "primary"
-            ? "text-primary-900"
-            : kpi.color === "secondary"
-              ? "text-secondary-900"
-              : "text-accent-900";
+              ? "text-slate-600"
+              : "text-emerald-600";
 
         return (
           <div
             key={idx}
-            className="bg-card rounded-lg border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"
           >
             <div className="flex items-start justify-between mb-3">
-              <div className={`${bgColor} p-2.5 rounded-lg`}>
+              <div className={`${bgColor} p-2 rounded-lg`}>
                 <Icon className={`w-5 h-5 ${iconColor}`} />
               </div>
               {kpi.trend && (
                 <div className="flex items-center gap-1">
                   {kpi.trend === "down" ? (
-                    <TrendingDown className="w-4 h-4 text-primary-600" />
+                    <TrendingDown className="w-4 h-4 text-emerald-600" />
                   ) : (
-                    <TrendingUp className="w-4 h-4 text-destructive" />
+                    <TrendingUp className="w-4 h-4 text-rose-600" />
                   )}
                 </div>
               )}
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">
+              <p className="text-sm font-medium text-slate-500 mb-1">
                 {kpi.label}
               </p>
-              <p className={`text-2xl font-bold ${textColor}`}>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">
                 {kpi.value}
                 {kpi.unit && (
-                  <span className="text-sm font-normal text-muted-foreground ml-1.5">
+                  <span className="text-sm font-normal text-slate-500 ml-1.5">
                     {kpi.unit}
                   </span>
                 )}

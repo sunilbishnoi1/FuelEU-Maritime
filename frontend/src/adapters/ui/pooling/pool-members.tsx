@@ -17,27 +17,27 @@ interface PoolMembersProps {
 
 export const PoolMembers: React.FC<PoolMembersProps> = ({ members }) => {
   return (
-    <Card className="p-6 mt-6">
-      <h3 className="text-lg font-semibold mb-4 text-secondary-900">
+    <Card className="p-6 mt-6 bg-white border-slate-200 shadow-sm rounded-xl">
+      <h3 className="text-lg font-semibold mb-4 text-slate-900">
         Pool Members
       </h3>
       {members.length === 0 ? (
-        <p className="text-muted-foreground">No members in pool yet</p>
+        <p className="text-slate-500">No members in pool yet</p>
       ) : (
-        <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="bg-secondary-50 border-b border-border">
-                <TableHead className="text-secondary-900 font-semibold">
+              <TableRow className="bg-slate-50 border-b border-slate-200">
+                <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
                   Ship ID
                 </TableHead>
-                <TableHead className="text-secondary-900 font-semibold">
+                <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
                   Before Pool
                 </TableHead>
-                <TableHead className="text-secondary-900 font-semibold">
+                <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
                   After Pool
                 </TableHead>
-                <TableHead className="text-secondary-900 font-semibold">
+                <TableHead className="text-slate-500 font-semibold text-xs uppercase tracking-wider">
                   Status
                 </TableHead>
               </TableRow>
@@ -46,19 +46,19 @@ export const PoolMembers: React.FC<PoolMembersProps> = ({ members }) => {
               {members.map((member, idx) => (
                 <TableRow
                   key={member.ship_id}
-                  className={`border-b border-border hover:bg-primary-50 transition-colors ${
-                    idx % 2 === 0 ? "bg-card" : "bg-secondary-50/30"
+                  className={`border-b border-slate-100 hover:bg-slate-50/80 transition-colors ${
+                    idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"
                   }`}
                 >
-                  <TableCell className="font-semibold text-secondary-800">
+                  <TableCell className="font-semibold text-slate-800">
                     {member.ship_name || member.ship_id}
                   </TableCell>
-                  <TableCell className="text-secondary-700 font-mono text-sm">
+                  <TableCell className="text-slate-600 font-mono text-sm tabular-nums">
                     {Number.isFinite(Number(member.cb_before))
                       ? Number(member.cb_before).toFixed(2)
                       : "—"}
                   </TableCell>
-                  <TableCell className="text-secondary-700 font-mono text-sm">
+                  <TableCell className="text-slate-600 font-mono text-sm tabular-nums">
                     {member.cb_after !== null &&
                     Number.isFinite(Number(member.cb_after))
                       ? Number(member.cb_after).toFixed(2)
@@ -70,6 +70,11 @@ export const PoolMembers: React.FC<PoolMembersProps> = ({ members }) => {
                         member.cb_after !== null && member.cb_after >= 0
                           ? "success"
                           : "error"
+                      }
+                      className={
+                        member.cb_after !== null && member.cb_after >= 0
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border-rose-200"
                       }
                     >
                       {member.cb_after !== null && member.cb_after >= 0

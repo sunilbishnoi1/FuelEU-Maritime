@@ -35,12 +35,6 @@ interface ComparisonChartProps {
   targetGhgIntensity: number;
 }
 
-const getCSSVariable = (name: string): string => {
-  if (typeof window === 'undefined') return '';
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return value;
-};
-
 const hexToRgba = (hex: string, alpha: number = 1): string => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (result) {
@@ -57,9 +51,9 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
   comparisonRoutes,
   targetGhgIntensity,
 }) => {
-  const secondaryColor = getCSSVariable('--color-secondary-500') || '#627D98';
-  const primaryColor = getCSSVariable('--color-primary-500') || '#1F8A9E';
-  const destructiveColor = getCSSVariable('--color-destructive') || '#EF4444';
+  const baselineColor = '#cbd5e1'; // slate-300
+  const comparisonColor = '#3b82f6'; // blue-500
+  const targetColor = '#f43f5e'; // rose-500
 
   const routeLabels = Array.from(new Set([...baselineRoutes, ...comparisonRoutes].map(route => route.routeId)));
 
@@ -78,60 +72,104 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
     datasets: [
       {
         type: 'bar' as const,
-        label: 'Baseline GHG Intensity (gCO₂e/MJ)',
+        label: 'Baseline GHG',
         data: baselineData,
-        backgroundColor: hexToRgba(secondaryColor, 0.6),
-        borderColor: hexToRgba(secondaryColor, 1),
+        backgroundColor: hexToRgba(baselineColor, 0.8),
+        borderColor: baselineColor,
         borderWidth: 1,
+        borderRadius: 4,
       },
       {
         type: 'bar' as const,
-        label: 'Comparison GHG Intensity (gCO₂e/MJ)',
+        label: 'Optimized GHG',
         data: comparisonData,
-        backgroundColor: hexToRgba(primaryColor, 0.6),
-        borderColor: hexToRgba(primaryColor, 1),
+        backgroundColor: hexToRgba(comparisonColor, 0.9),
+        borderColor: comparisonColor,
         borderWidth: 1,
+        borderRadius: 4,
       },
       {
         type: 'line' as const,
-        label: 'Target GHG Intensity (gCO₂e/MJ)',
+        label: 'Target Limit',
         data: routeLabels.map(() => targetGhgIntensity),
-        borderColor: hexToRgba(destructiveColor, 1),
+        borderColor: targetColor,
+        backgroundColor: targetColor,
         borderWidth: 2,
         fill: false,
         pointRadius: 0,
+        pointHoverRadius: 0,
+        borderDash: [5, 5],
       },
     ],
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: '#475569', // slate-600
+          font: { family: 'Inter, sans-serif', weight: 500 },
+          usePointStyle: true,
+          pointStyle: 'circle' as const,
+          boxWidth: 8,
+          padding: 20,
+        },
       },
       title: {
-        display: true,
-        text: 'GHG Intensity Comparison by Route',
+        display: false,
       },
+      tooltip: {
+        backgroundColor: '#1e293b', // slate-800
+        titleFont: { family: 'Inter, sans-serif', size: 13, weight: 600 },
+        bodyFont: { family: 'Inter, sans-serif', size: 12 },
+        padding: 12,
+        cornerRadius: 8,
+      }
     },
     scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: '#64748b', // slate-500
+          font: { family: 'Inter, sans-serif' },
+        },
+      },
       y: {
         beginAtZero: true,
+        grid: {
+          color: '#f1f5f9', // slate-100
+        },
+        border: {
+          display: false,
+        },
+        ticks: {
+          color: '#64748b', // slate-500
+          font: { family: 'Inter, sans-serif' },
+          padding: 8,
+        },
         title: {
           display: true,
-          text: 'GHG Intensity (gCO₂e/MJ)',
+          text: 'gCO₂e/MJ',
+          color: '#94a3b8', // slate-400
+          font: { family: 'Inter, sans-serif', size: 12, weight: 500 },
         },
       },
     },
   };
 
   return (
-    <Card className="p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-secondary-900">GHG Intensity Chart</h3>
+    <Card className="p-6 bg-white border-slate-200 shadow-sm rounded-xl">
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-slate-900">GHG Intensity Chart</h3>
       </div>
-      <Chart type='bar' data={data} options={options} />
+      <div className="h-[350px] w-full">
+        <Chart type='bar' data={data} options={options} />
+      </div>
     </Card>
   );
 };

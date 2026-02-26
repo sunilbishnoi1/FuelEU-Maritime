@@ -130,13 +130,13 @@ describe("Compliance HTTP Endpoints", () => {
       expect(response.body.adjustedCb).toBe(700000); // 500000 + 200000
     });
 
-    it("should return 400 if shipId is missing", async () => {
+    it("should return 200 and all ships if shipId is missing", async () => {
       const response = await request(app)
         .get("/compliance/adjusted-cb")
         .query({ year: 2025 });
 
-      expect(response.status).toBe(400);
-      expect(response.body.message).toContain("required");
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
     });
 
     it("should return correct shipId and year in response", async () => {

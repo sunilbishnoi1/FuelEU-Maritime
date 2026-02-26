@@ -42,13 +42,15 @@ const ComparePage: React.FC = () => {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
-          GHG Intensity Comparison
-        </h1>
-        <p className="text-secondary-600">
-          Compare baseline vs. optimized routes
-        </p>
+      <div className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">
+            GHG Intensity Comparison
+          </h1>
+          <p className="text-slate-500">
+            Compare baseline vs. optimized routes
+          </p>
+        </div>
       </div>
 
       {error && (

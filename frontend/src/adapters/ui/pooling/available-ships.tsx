@@ -15,8 +15,8 @@ export const AvailableShips: React.FC<AvailableShipsProps> = ({
   onSelectShip,
 }) => {
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4 text-secondary-900">
+    <Card className="p-6 bg-white border-slate-200 shadow-sm rounded-xl">
+      <h3 className="text-lg font-semibold mb-4 text-slate-900">
         Available Ships
       </h3>
       <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -34,7 +34,7 @@ export const AvailableShips: React.FC<AvailableShipsProps> = ({
             return (
               <div
                 key={ship.ship_id}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-primary-50 transition-colors border border-border"
+                className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors border border-slate-200"
               >
                 <label
                   htmlFor={`ship-${ship.ship_id}`}
@@ -47,12 +47,12 @@ export const AvailableShips: React.FC<AvailableShipsProps> = ({
                       onSelectShip(ship.ship_id, checked as boolean)
                     }
                   />
-                  <span className="font-medium text-secondary-800">
+                  <span className="font-medium text-slate-800">
                     Ship {ship.ship_id}
                   </span>
                 </label>
                 <span
-                  className={`text-xs font-mono ml-2 ${isPositive ? "text-primary-700" : "text-destructive"}`}
+                  className={`text-sm font-mono tracking-tight ml-2 ${isPositive ? "text-emerald-700 font-semibold" : "text-rose-600 font-semibold"}`}
                 >
                   {display}
                 </span>

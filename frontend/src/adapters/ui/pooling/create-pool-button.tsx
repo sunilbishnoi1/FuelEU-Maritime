@@ -9,7 +9,7 @@ interface CreatePoolButtonProps {
 export const CreatePoolButton: React.FC<CreatePoolButtonProps> = ({ onCreatePool, isPoolValid }) => {
   return (
     <div className="mt-6">
-      <Button onClick={onCreatePool} disabled={!isPoolValid} className="w-full">
+      <Button onClick={onCreatePool} disabled={!isPoolValid} className="w-full text-base font-semibold py-6 shadow-sm">
         Create Pool
       </Button>
     </div>

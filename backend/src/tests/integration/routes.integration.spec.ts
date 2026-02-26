@@ -206,7 +206,10 @@ describe("Routes HTTP Endpoints", () => {
   describe("GET /routes/comparison - No Baseline", () => {
     it("should return empty array when no baseline is set", async () => {
       // Set routes with no baseline marked
-      const routesWithNoBaseline = ALL_ROUTES.map((r: any) => ({ ...r, is_baseline: false }));
+      const routesWithNoBaseline = ALL_ROUTES.map((r: any) => ({
+        ...r,
+        is_baseline: false,
+      }));
       mockRoutesRepository.setRoutes(routesWithNoBaseline);
 
       const response = await request(app).get("/routes/comparison");

@@ -1,5 +1,8 @@
 import { Router, type Request, type Response } from "express";
-import { ComplianceService, type AdjustedCbDto } from "../../../core/application/compliance_service.js";
+import {
+  ComplianceService,
+  type AdjustedCbDto,
+} from "../../../core/application/compliance_service.js";
 
 export function createComplianceRouter(
   complianceService: ComplianceService,
@@ -47,12 +50,16 @@ export function createComplianceRouter(
       // If no shipId provided, return adjusted CB for all ships
       if (!shipId) {
         const allAdjusted: AdjustedCbDto[] =
-          await complianceService.getAdjustedComplianceBalanceForAllShips(parsedYear);
-        return res.json(allAdjusted.map((entry) => ({
-          shipId: entry.shipId,
-          year: parsedYear,
-          adjustedCb: entry.adjustedCb,
-        })));
+          await complianceService.getAdjustedComplianceBalanceForAllShips(
+            parsedYear,
+          );
+        return res.json(
+          allAdjusted.map((entry) => ({
+            shipId: entry.shipId,
+            year: parsedYear,
+            adjustedCb: entry.adjustedCb,
+          })),
+        );
       }
 
       const adjustedCb = await complianceService.getAdjustedComplianceBalance(
@@ -72,7 +79,6 @@ export function createComplianceRouter(
       return res.status(500).json({ message: "Internal server error" });
     }
   });
-
 
   return complianceRouter;
 }

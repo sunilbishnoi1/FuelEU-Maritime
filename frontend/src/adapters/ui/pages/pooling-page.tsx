@@ -263,13 +263,15 @@ const PoolingPage: React.FC = () => {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
-          Pooling Overview
-        </h1>
-        <p className="text-secondary-600">
-          Create and manage compliance pooling arrangements
-        </p>
+      <div className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">
+            Pooling Overview
+          </h1>
+          <p className="text-slate-500">
+            Create and manage compliance pooling arrangements
+          </p>
+        </div>
       </div>
 
       {error && (

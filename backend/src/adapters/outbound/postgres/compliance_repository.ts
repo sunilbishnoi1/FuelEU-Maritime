@@ -28,7 +28,9 @@ export class PgComplianceRepository implements ComplianceRepository {
     );
     const row = result.rows[0];
     if (!row) {
-      throw new Error(`Failed to save compliance for ship ${ship_id}, year ${year}`);
+      throw new Error(
+        `Failed to save compliance for ship ${ship_id}, year ${year}`,
+      );
     }
     return row;
   }

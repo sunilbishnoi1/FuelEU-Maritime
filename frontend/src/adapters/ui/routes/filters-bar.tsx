@@ -48,12 +48,12 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
   }, [routes]);
 
   return (
-    <div className="bg-card p-6 rounded-lg border border-border shadow-sm mb-6">
+    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
         <div className="lg:col-span-3">
           <label
             htmlFor="vesselType"
-            className="block text-sm font-semibold text-secondary-900 mb-2"
+            className="block text-sm font-medium text-slate-700 mb-1.5"
           >
             Vessel Type
           </label>
@@ -68,7 +68,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
         <div className="lg:col-span-3">
           <label
             htmlFor="fuelType"
-            className="block text-sm font-semibold text-secondary-900 mb-2"
+            className="block text-sm font-medium text-slate-700 mb-1.5"
           >
             Fuel Type
           </label>
@@ -83,7 +83,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
         <div className="lg:col-span-3">
           <label
             htmlFor="year"
-            className="block text-sm font-semibold text-secondary-900 mb-2"
+            className="block text-sm font-medium text-slate-700 mb-1.5"
           >
             Year
           </label>
