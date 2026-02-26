@@ -54,11 +54,14 @@ export const PoolMembers: React.FC<PoolMembersProps> = ({ members }) => {
                     {member.ship_name || member.ship_id}
                   </TableCell>
                   <TableCell className="text-secondary-700 font-mono text-sm">
-                    {member.cb_before.toFixed(2)}
+                    {Number.isFinite(Number(member.cb_before))
+                      ? Number(member.cb_before).toFixed(2)
+                      : "—"}
                   </TableCell>
                   <TableCell className="text-secondary-700 font-mono text-sm">
-                    {member.cb_after !== null
-                      ? member.cb_after.toFixed(2)
+                    {member.cb_after !== null &&
+                    Number.isFinite(Number(member.cb_after))
+                      ? Number(member.cb_after).toFixed(2)
                       : "N/A"}
                   </TableCell>
                   <TableCell>

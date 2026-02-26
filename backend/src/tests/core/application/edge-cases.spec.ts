@@ -38,8 +38,8 @@ describe("Edge Cases Tests", () => {
       const comparison = await routesService.getComparison();
 
       expect(comparison).toHaveLength(1);
-      expect(comparison[0].percentDiff).toBe(0);
-      expect(comparison[0].compliant).toBe(true);
+      expect(comparison[0]?.percentDiff).toBe(0);
+      expect(comparison[0]?.compliant).toBe(true);
     });
 
     it("should handle very large intensity differences", async () => {

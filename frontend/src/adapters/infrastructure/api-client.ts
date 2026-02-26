@@ -42,30 +42,30 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 // Routes API
 export const routesApi = {
-getAllRoutes: async (filters?: { vesselType?: string; fuelType?: string; year?: number }): Promise<ApiRoute[]> => {
-  const params = new URLSearchParams();
-  if (filters?.vesselType) params.append('vesselType', filters.vesselType);
-  if (filters?.fuelType) params.append('fuelType', filters.fuelType);
-  if (filters?.year) params.append('year', String(filters.year));
-  const queryString = params.toString();
-  const url = queryString ? `${API_BASE_URL}/routes?${queryString}` : `${API_BASE_URL}/routes`;
-  const response = await fetch(url);
-  const data = await handleResponse<ApiRoute[]>(response);
+  getAllRoutes: async (filters?: { vesselType?: string; fuelType?: string; year?: number }): Promise<ApiRoute[]> => {
+    const params = new URLSearchParams();
+    if (filters?.vesselType) params.append('vesselType', filters.vesselType);
+    if (filters?.fuelType) params.append('fuelType', filters.fuelType);
+    if (filters?.year) params.append('year', String(filters.year));
+    const queryString = params.toString();
+    const url = queryString ? `${API_BASE_URL}/routes?${queryString}` : `${API_BASE_URL}/routes`;
+    const response = await fetch(url);
+    const data = await handleResponse<ApiRoute[]>(response);
 
-  // keep snake_case to match ApiRoute interface
-  return data.map(r => ({
-    id: r.id,
-    route_id: r.route_id,
-    year: Number(r.year),
-    ghg_intensity: Number(r.ghg_intensity),
-    is_baseline: r.is_baseline,
-    vessel_type: r.vessel_type,
-    fuel_type: r.fuel_type,
-    fuel_consumption: Number(r.fuel_consumption),
-    distance: Number(r.distance),
-    total_emissions: Number(r.total_emissions),
-  }));
-},
+    // keep snake_case to match ApiRoute interface
+    return data.map(r => ({
+      id: r.id,
+      route_id: r.route_id,
+      year: Number(r.year),
+      ghg_intensity: Number(r.ghg_intensity),
+      is_baseline: r.is_baseline,
+      vessel_type: r.vessel_type,
+      fuel_type: r.fuel_type,
+      fuel_consumption: Number(r.fuel_consumption),
+      distance: Number(r.distance),
+      total_emissions: Number(r.total_emissions),
+    }));
+  },
 
 
 

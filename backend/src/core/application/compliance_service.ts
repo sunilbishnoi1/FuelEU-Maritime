@@ -20,7 +20,7 @@ export class ComplianceService {
     private routesRepository: RoutesRepository,
     private bankingRepository: BankingRepository,
     private shipRepository: IShipRepository,
-  ) {}
+  ) { }
 
   async getComplianceBalance(
     shipId: string,
@@ -41,26 +41,20 @@ export class ComplianceService {
     }
 
     // C1: Use actual fuel_consumption from route data instead of hardcoded value
-    const fuelConsumption = route.fuel_consumption;
-    if (
-      typeof fuelConsumption !== "number" ||
-      !Number.isFinite(fuelConsumption) ||
-      fuelConsumption <= 0
-    ) {
+    // pg driver returns NUMERIC columns as strings, so coerce to number
+    const fuelConsumption = Number(route.fuel_consumption);
+    if (!Number.isFinite(fuelConsumption) || fuelConsumption <= 0) {
       throw new Error(
-        `Invalid fuel_consumption for route ${routeId}: ${fuelConsumption}`,
+        `Invalid fuel_consumption for route ${routeId}: ${route.fuel_consumption}`,
       );
     }
 
     const energyInScope = fuelConsumption * ENERGY_CONVERSION_FACTOR; // MJ
-    const actualIntensity = route.ghg_intensity;
+    const actualIntensity = Number(route.ghg_intensity);
 
-    if (
-      typeof actualIntensity !== "number" ||
-      !Number.isFinite(actualIntensity)
-    ) {
+    if (!Number.isFinite(actualIntensity)) {
       throw new Error(
-        `Invalid ghg_intensity for route ${routeId}: ${actualIntensity}`,
+        `Invalid ghg_intensity for route ${routeId}: ${route.ghg_intensity}`,
       );
     }
 
@@ -101,8 +95,14 @@ export class ComplianceService {
     const adjustedBalances: AdjustedCbDto[] = [];
 
     for (const ship of allShips) {
-      const adjustedCb = await this.getAdjustedComplianceBalance(ship.id, year);
-      adjustedBalances.push({ shipId: ship.id, adjustedCb });
+      try {
+        const adjustedCb = await this.getAdjustedComplianceBalance(ship.id, year);
+        adjustedBalances.push({ shipId: ship.id, adjustedCb });
+      } catch (error) {
+        // Skip ships whose route data is incomplete/invalid
+        console.warn(`Skipping ship ${ship.id}: ${error instanceof Error ? error.message : error}`);
+        adjustedBalances.push({ shipId: ship.id, adjustedCb: null });
+      }
     }
 
     return adjustedBalances;

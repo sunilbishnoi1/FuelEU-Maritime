@@ -16,7 +16,7 @@ export function createRoutesRouter(routesService: RoutesService): Router {
 
   routesRouter.post("/:id/baseline", async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const id = req.params['id'] as string | undefined;
       if (!id) {
         return res.status(400).json({ message: "Route ID is required" });
       }

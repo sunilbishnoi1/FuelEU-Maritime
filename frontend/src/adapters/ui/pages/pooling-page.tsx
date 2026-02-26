@@ -38,8 +38,17 @@ function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
   }>;
 } {
   const errors: string[] = [];
-  const totalSum = selectedShips.reduce(
-    (s, ship) => s + ship.adjusted_cb_gco2eq,
+  // Normalize numeric fields (API may return strings)
+  const normalized: Array<AdjustedCompliance & { adjusted_cb_gco2eq: number }> =
+    selectedShips.map((s) => ({
+      ...s,
+      adjusted_cb_gco2eq: Number(s.adjusted_cb_gco2eq),
+    }));
+
+  const totalSum = normalized.reduce(
+    (s, ship) =>
+      s +
+      (Number.isFinite(ship.adjusted_cb_gco2eq) ? ship.adjusted_cb_gco2eq : 0),
     0,
   );
 
@@ -49,8 +58,12 @@ function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
   }
 
   // Separate deficit and surplus ships
-  const deficitShips = selectedShips.filter((s) => s.adjusted_cb_gco2eq < 0);
-  const surplusShips = selectedShips.filter((s) => s.adjusted_cb_gco2eq >= 0);
+  const deficitShips = normalized.filter(
+    (s) => Number.isFinite(s.adjusted_cb_gco2eq) && s.adjusted_cb_gco2eq < 0,
+  );
+  const surplusShips = normalized.filter(
+    (s) => Number.isFinite(s.adjusted_cb_gco2eq) && s.adjusted_cb_gco2eq >= 0,
+  );
 
   // Simulate greedy allocation: distribute surplus to cover deficits
   let remainingSurplus = surplusShips.reduce(
@@ -58,20 +71,14 @@ function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
     0,
   );
 
-  const simulatedMembers = selectedShips.map((ship) => {
-    if (ship.adjusted_cb_gco2eq >= 0) {
-      // Surplus ship contributes proportionally
-      return {
-        ship_id: ship.ship_id,
-        cb_before: ship.adjusted_cb_gco2eq,
-        cb_after: 0,
-      };
+  const simulatedMembers = normalized.map((ship) => {
+    const val = Number.isFinite(ship.adjusted_cb_gco2eq)
+      ? ship.adjusted_cb_gco2eq
+      : 0;
+    if (val >= 0) {
+      return { ship_id: ship.ship_id, cb_before: val, cb_after: 0 };
     }
-    return {
-      ship_id: ship.ship_id,
-      cb_before: ship.adjusted_cb_gco2eq,
-      cb_after: ship.adjusted_cb_gco2eq,
-    };
+    return { ship_id: ship.ship_id, cb_before: val, cb_after: val };
   });
 
   // Greedy: allocate surplus to deficit ships
@@ -110,8 +117,14 @@ function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
   for (const ship of deficitShips) {
     const simulated = simulatedMembers.find((m) => m.ship_id === ship.ship_id);
     if (simulated && simulated.cb_after < simulated.cb_before) {
+      const afterStr = Number.isFinite(simulated.cb_after)
+        ? simulated.cb_after.toFixed(2)
+        : "—";
+      const beforeStr = Number.isFinite(simulated.cb_before)
+        ? simulated.cb_before.toFixed(2)
+        : "—";
       errors.push(
-        `Deficit ship ${ship.ship_id} would exit with worse CB (${simulated.cb_after.toFixed(2)} < ${simulated.cb_before.toFixed(2)}).`,
+        `Deficit ship ${ship.ship_id} would exit with worse CB (${afterStr} < ${beforeStr}).`,
       );
     }
   }
@@ -120,8 +133,11 @@ function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
   for (const ship of surplusShips) {
     const simulated = simulatedMembers.find((m) => m.ship_id === ship.ship_id);
     if (simulated && simulated.cb_after < 0) {
+      const afterStr = Number.isFinite(simulated.cb_after)
+        ? simulated.cb_after.toFixed(2)
+        : "—";
       errors.push(
-        `Surplus ship ${ship.ship_id} would exit negative (cb_after=${simulated.cb_after.toFixed(2)}).`,
+        `Surplus ship ${ship.ship_id} would exit negative (cb_after=${afterStr}).`,
       );
     }
   }
