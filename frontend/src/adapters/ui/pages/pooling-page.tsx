@@ -150,9 +150,7 @@ function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
 }
 
 const PoolingPage: React.FC = () => {
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear(),
-  );
+  const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [availableShips, setAvailableShips] = useState<AdjustedCompliance[]>(
     [],
   );
