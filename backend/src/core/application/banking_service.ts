@@ -1,6 +1,6 @@
-import { BankEntry } from "../domain/bank_entry";
-import { type BankingRepository } from "../ports/banking_repository";
-import { type ComplianceRepository } from "../ports/compliance_repository";
+import { BankEntry } from "../domain/bank_entry.js";
+import { type BankingRepository } from "../ports/banking_repository.js";
+import { type ComplianceRepository } from "../ports/compliance_repository.js";
 import { v4 as uuidv4 } from "uuid";
 
 export class BankingService {
@@ -40,22 +40,19 @@ export class BankingService {
     shipId: string,
     year: number,
     amountToApply: number,
-  ): Promise<BankEntry | null> {
-    const availableSurplus = await this.bankingRepository.getAvailableSurplus(
-      shipId,
-      year,
-    );
-
-    if (amountToApply <= 0 || amountToApply > availableSurplus) {
+  ): Promise<BankEntry> {
+    if (amountToApply <= 0) {
       throw new Error(
         "Invalid amount to apply or insufficient banked surplus.",
       );
     }
 
-    // For now, we'll just record the application as a negative bank entry.
-    // A more sophisticated system might adjust the original bank entries or have a separate "applied" record.
+    // H2: Use transactional apply to prevent race conditions
     const appliedEntry = new BankEntry(uuidv4(), shipId, year, -amountToApply);
-
-    return this.bankingRepository.save(appliedEntry);
+    return this.bankingRepository.applyWithinTransaction(
+      shipId,
+      year,
+      appliedEntry,
+    );
   }
 }

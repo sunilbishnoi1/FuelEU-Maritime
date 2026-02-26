@@ -1,10 +1,9 @@
-import type { Pool } from '../domain/entities';
+import type { Pool, AdjustedCompliance, PoolCreationRequest } from '../domain/entities';
 import type { ComplianceRepository } from '../ports/outbound';
 import type {
   FetchAdjustedComplianceBalanceUseCase,
   CreatePoolUseCase,
 } from '../ports/inbound';
-import type { AdjustedCompliance, PoolCreationRequest } from '../../types';
 
 export class FetchAdjustedComplianceBalance implements FetchAdjustedComplianceBalanceUseCase {
   private readonly complianceRepository: ComplianceRepository;

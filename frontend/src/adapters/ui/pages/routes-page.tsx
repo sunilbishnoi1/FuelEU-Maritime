@@ -1,40 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import { fetchRoutesUseCase, setBaselineUseCase } from '../../../core/application/service-locator';
-import type { Route } from '../../../core/domain/entities';
-import { RoutesTable } from '../routes/routes-table';
-import { FiltersBar } from '../routes/filters-bar';
-import { RouteKPIs } from '../routes/route-kpis';
-import type { RouteFilters } from '../../../types';
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  fetchRoutesUseCase,
+  setBaselineUseCase,
+} from "../../../composition-root";
+import type { Route, RouteFilters } from "../../../core/domain/entities";
+import { RoutesTable } from "../routes/routes-table";
+import { FiltersBar } from "../routes/filters-bar";
+import { RouteKPIs } from "../routes/route-kpis";
 
 const RoutesPage: React.FC = () => {
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [allRoutes, setAllRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<RouteFilters>({});
 
-  useEffect(() => {
-    const loadRoutes = async () => {
-      try {
-        setLoading(true);
-        const fetchedRoutes = await fetchRoutesUseCase.execute(filters);
-        setRoutes(fetchedRoutes);
-      } catch (err) {
-        setError('Failed to fetch routes.');
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const loadRoutes = useCallback(async (currentFilters: RouteFilters) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedRoutes = await fetchRoutesUseCase.execute(currentFilters);
+      setRoutes(fetchedRoutes);
+      // On initial/unfiltered load, save all routes for dynamic filter options
+      if (
+        !currentFilters.vesselType &&
+        !currentFilters.fuelType &&
+        !currentFilters.year
+      ) {
+        setAllRoutes(fetchedRoutes);
       }
-    };
-    loadRoutes();
-  }, [filters]);
+    } catch (err) {
+      setError("Failed to fetch routes.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRoutes(filters);
+  }, [filters, loadRoutes]);
 
   const handleSetBaseline = async (id: string) => {
     try {
+      setError(null);
       await setBaselineUseCase.execute(id);
       const updatedRoutes = await fetchRoutesUseCase.execute(filters);
       setRoutes(updatedRoutes);
+      // Refresh allRoutes too for baseline status update
+      if (!filters.vesselType && !filters.fuelType && !filters.year) {
+        setAllRoutes(updatedRoutes);
+      }
     } catch (err) {
-      setError('Failed to set baseline.');
+      setError("Failed to set baseline.");
       console.error(err);
     }
   };
@@ -43,26 +61,53 @@ const RoutesPage: React.FC = () => {
     setFilters(newFilters);
   };
 
-  if (error) {
-    return (
-      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 text-destructive">
-        <h3 className="font-semibold mb-2">Error Loading Routes</h3>
-        <p>{error}</p>
-      </div>
-    );
-  }
+  const handleDismissError = () => {
+    setError(null);
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    loadRoutes(filters);
+  };
 
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">Routes Overview</h1>
-        <p className="text-secondary-600">Manage and analyze your shipping routes</p>
+        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
+          Routes Overview
+        </h1>
+        <p className="text-secondary-600">
+          Manage and analyze your shipping routes
+        </p>
       </div>
-      
+
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive mb-6 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold mb-1">Error</h3>
+            <p className="text-sm">{error}</p>
+          </div>
+          <div className="flex gap-2 ml-4 shrink-0">
+            <button
+              onClick={handleRetry}
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-destructive/20 hover:bg-destructive/30 transition-colors"
+            >
+              Retry
+            </button>
+            <button
+              onClick={handleDismissError}
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-destructive/10 hover:bg-destructive/20 transition-colors"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <RouteKPIs routes={routes} loading={loading} />
-      
-      <FiltersBar onFilterChange={handleFilterChange} />
-      
+
+      <FiltersBar onFilterChange={handleFilterChange} routes={allRoutes} />
+
       {loading ? (
         <div className="bg-card rounded-lg border border-border p-8 text-center shadow-sm">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-3"></div>

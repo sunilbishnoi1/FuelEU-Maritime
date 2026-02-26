@@ -1,10 +1,11 @@
 import { type Route } from "../../core/domain/route";
 import { Compliance } from "../../core/domain/compliance";
 import { BankEntry } from "../../core/domain/bank_entry";
+import { type Ship } from "../../core/domain/ship";
 
 export const BASELINE_ROUTE: Route = {
   id: "route-1",
-  route_id: "baseline",
+  route_id: "route-1",
   year: 2025,
   ghg_intensity: 89.3368,
   is_baseline: true,
@@ -17,7 +18,7 @@ export const BASELINE_ROUTE: Route = {
 
 export const ROUTE_2: Route = {
   id: "route-2",
-  route_id: "route-2-data",
+  route_id: "route-2",
   year: 2025,
   ghg_intensity: 95.0,
   is_baseline: false,
@@ -30,7 +31,7 @@ export const ROUTE_2: Route = {
 
 export const ROUTE_3: Route = {
   id: "route-3",
-  route_id: "route-3-data",
+  route_id: "route-3",
   year: 2025,
   ghg_intensity: 85.0,
   is_baseline: false,
@@ -43,7 +44,7 @@ export const ROUTE_3: Route = {
 
 export const ROUTE_4: Route = {
   id: "route-4",
-  route_id: "route-4-data",
+  route_id: "route-4",
   year: 2025,
   ghg_intensity: 100.0,
   is_baseline: false,
@@ -56,7 +57,7 @@ export const ROUTE_4: Route = {
 
 export const ROUTE_5: Route = {
   id: "route-5",
-  route_id: "route-5-data",
+  route_id: "route-5",
   year: 2025,
   ghg_intensity: 80.0,
   is_baseline: false,
@@ -123,7 +124,7 @@ export function createRoute(
 ): Route {
   return {
     id,
-    route_id: `route-${id}`,
+    route_id: id,
     year: 2025,
     ghg_intensity: intensity,
     is_baseline: isBaseline,
@@ -149,4 +150,16 @@ export function createBankEntry(
   amount: number,
 ): BankEntry {
   return new BankEntry(`bank-${shipId}`, shipId, year, amount);
+}
+
+export function createShip(
+  id: string,
+  routeId: string,
+  name?: string,
+): Ship {
+  return {
+    id,
+    name: name ?? `Ship ${id}`,
+    route_id: routeId,
+  };
 }

@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import type { RouteFilters } from "../../../types";
+import React, { useState, useMemo } from "react";
+import type { RouteFilters, Route } from "../../../core/domain/entities";
 import { Button } from "../../../shared/components/button";
 import { CustomSelect } from "../../../shared/components/select";
 
 interface FiltersBarProps {
   onFilterChange: (filters: RouteFilters) => void;
+  routes: Route[];
 }
 
-export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
+export const FiltersBar: React.FC<FiltersBarProps> = ({
+  onFilterChange,
+  routes,
+}) => {
   const [vesselType, setVesselType] = useState<string>("");
   const [fuelType, setFuelType] = useState<string>("");
   const [year, setYear] = useState<string>("");
@@ -27,24 +31,21 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
     onFilterChange({});
   };
 
-  // Mock data for select options - replace with actual data fetched from API if available
-  const vesselTypeOptions = [
-    { value: "Container", label: "Container" },
-    { value: "BulkCarrier", label: "Bulk Carrier" },
-    { value: "Tanker", label: "Tanker" },
-    { value: "RoRo", label: "RoRo" },
-  ];
+  // Derive filter options dynamically from actual route data
+  const vesselTypeOptions = useMemo(() => {
+    const types = [...new Set(routes.map((r) => r.vesselType))].sort();
+    return types.map((t) => ({ value: t, label: t }));
+  }, [routes]);
 
-  const fuelTypeOptions = [
-    { value: "HFO", label: "HFO" },
-    { value: "LNG", label: "LNG" },
-    { value: "MGO", label: "MGO" },
-  ];
+  const fuelTypeOptions = useMemo(() => {
+    const types = [...new Set(routes.map((r) => r.fuelType))].sort();
+    return types.map((t) => ({ value: t, label: t }));
+  }, [routes]);
 
-  const yearOptions = [
-    { value: "2024", label: "2024" },
-    { value: "2025", label: "2025" },
-  ];
+  const yearOptions = useMemo(() => {
+    const years = [...new Set(routes.map((r) => r.year))].sort();
+    return years.map((y) => ({ value: String(y), label: String(y) }));
+  }, [routes]);
 
   return (
     <div className="bg-card p-6 rounded-lg border border-border shadow-sm mb-6">
@@ -95,10 +96,18 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({ onFilterChange }) => {
           />
         </div>
         <div className="lg:col-span-3 flex gap-3">
-          <Button onClick={handleApplyFilters} variant="primary" className="flex-1">
+          <Button
+            onClick={handleApplyFilters}
+            variant="primary"
+            className="flex-1"
+          >
             Apply
           </Button>
-          <Button variant="outline" onClick={handleClearFilters} className="flex-1">
+          <Button
+            variant="outline"
+            onClick={handleClearFilters}
+            className="flex-1"
+          >
             Clear
           </Button>
         </div>

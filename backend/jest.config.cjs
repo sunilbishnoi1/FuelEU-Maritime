@@ -3,6 +3,8 @@ module.exports = {
   testEnvironment: "node",
 
   moduleNameMapper: {
+    // Strip .js extensions from relative imports so Jest resolves .ts files
+    "^(\\.{1,2}/.*)\\.js$": "$1",
     "^core/(.*)$": "<rootDir>/src/core/$1",
     "^adapters/(.*)$": "<rootDir>/src/adapters/$1",
     "^infrastructure/(.*)$": "<rootDir>/src/infrastructure/$1",

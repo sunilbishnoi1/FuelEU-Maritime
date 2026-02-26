@@ -1,10 +1,13 @@
-import { Compliance } from "../domain/compliance";
-import { type ComplianceRepository } from "../ports/compliance_repository";
-import { type RoutesRepository } from "../ports/routes_repository";
-import { type BankingRepository } from "../ports/banking_repository";
-import { type IShipRepository } from "../ports/ship_repository";
-import { type Ship } from "../domain/ship";
+import { Compliance } from "../domain/compliance.js";
+import { type ComplianceRepository } from "../ports/compliance_repository.js";
+import { type RoutesRepository } from "../ports/routes_repository.js";
+import { type BankingRepository } from "../ports/banking_repository.js";
+import { type IShipRepository } from "../ports/ship_repository.js";
 import { v4 as uuidv4 } from "uuid";
+import {
+  TARGET_INTENSITY_2025,
+  ENERGY_CONVERSION_FACTOR,
+} from "../../shared/constants.js";
 
 export interface AdjustedCbDto {
   shipId: string;
@@ -12,8 +15,6 @@ export interface AdjustedCbDto {
 }
 
 export class ComplianceService {
-  private readonly targetIntensity2025 = 89.3368; // gCO₂e/MJ
-
   constructor(
     private complianceRepository: ComplianceRepository,
     private routesRepository: RoutesRepository,
@@ -31,16 +32,27 @@ export class ComplianceService {
       return existingCompliance;
     }
 
-    // This is a simplification. In a real scenario, we'd have a way to get the route for a ship.
-    // Here we assume the shipId is the route_id.
-    const route = await this.routesRepository.findByRouteId(shipId);
+    // H5: Resolve the route via the ship-to-route mapping
+    const ship = await this.shipRepository.findById(shipId);
+    const routeId = ship ? ship.route_id : shipId; // Fallback to shipId for backward compat
+    const route = await this.routesRepository.findByRouteId(routeId);
     if (!route) {
       return null;
     }
 
-    // Mocked fuel consumption. In a real app, this would come from ship data.
-    const fuelConsumption = 1000; // in tonnes
-    const energyInScope = fuelConsumption * 41000; // MJ
+    // C1: Use actual fuel_consumption from route data instead of hardcoded value
+    const fuelConsumption = route.fuel_consumption;
+    if (
+      typeof fuelConsumption !== "number" ||
+      !Number.isFinite(fuelConsumption) ||
+      fuelConsumption <= 0
+    ) {
+      throw new Error(
+        `Invalid fuel_consumption for route ${routeId}: ${fuelConsumption}`,
+      );
+    }
+
+    const energyInScope = fuelConsumption * ENERGY_CONVERSION_FACTOR; // MJ
     const actualIntensity = route.ghg_intensity;
 
     if (
@@ -48,12 +60,12 @@ export class ComplianceService {
       !Number.isFinite(actualIntensity)
     ) {
       throw new Error(
-        `Invalid ghg_intensity for route ${shipId}: ${actualIntensity}`,
+        `Invalid ghg_intensity for route ${routeId}: ${actualIntensity}`,
       );
     }
 
     const complianceBalance =
-      (this.targetIntensity2025 - actualIntensity) * energyInScope;
+      (TARGET_INTENSITY_2025 - actualIntensity) * energyInScope;
 
     const newCompliance = new Compliance(
       uuidv4(),

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { fetchComparisonUseCase } from '../../../core/application/service-locator';
-import type { Route } from '../../../core/domain/entities';
-import { ComparisonTable } from '../compare/comparison-table';
-import { ComparisonChart } from '../compare/comparison-chart';
-import { ComparisonSummary } from '../compare/comparison-summary';
+import React, { useEffect, useState } from "react";
+import { fetchComparisonUseCase } from "../../../composition-root";
+import type { Route } from "../../../core/domain/entities";
+import { TARGET_GHG_INTENSITY } from "../../../core/domain/constants";
+import { ComparisonTable } from "../compare/comparison-table";
+import { ComparisonChart } from "../compare/comparison-chart";
+import { ComparisonSummary } from "../compare/comparison-summary";
 
 const ComparePage: React.FC = () => {
   const [baselineRoutes, setBaselineRoutes] = useState<Route[]>([]);
@@ -11,40 +12,67 @@ const ComparePage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const TARGET_GHG_INTENSITY = 89.3368; // 2% below 91.16
+  const loadComparisonData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { baseline, comparison } = await fetchComparisonUseCase.execute();
+      setBaselineRoutes(baseline);
+      setComparisonRoutes(comparison);
+    } catch (err) {
+      setError("Failed to fetch comparison data.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadComparisonData = async () => {
-      try {
-        setLoading(true);
-        const { baseline, comparison } = await fetchComparisonUseCase.execute();
-        setBaselineRoutes(baseline);
-        setComparisonRoutes(comparison);
-      } catch (err) {
-        setError('Failed to fetch comparison data.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadComparisonData();
   }, []);
 
-  if (error) {
-    return (
-      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 text-destructive">
-        <h3 className="font-semibold mb-2">Error Loading Comparison</h3>
-        <p>{error}</p>
-      </div>
-    );
-  }
+  const handleDismissError = () => {
+    setError(null);
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    loadComparisonData();
+  };
 
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">GHG Intensity Comparison</h1>
-        <p className="text-secondary-600">Compare baseline vs. optimized routes</p>
+        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
+          GHG Intensity Comparison
+        </h1>
+        <p className="text-secondary-600">
+          Compare baseline vs. optimized routes
+        </p>
       </div>
+
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive mb-6 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold mb-1">Error</h3>
+            <p className="text-sm">{error}</p>
+          </div>
+          <div className="flex gap-2 ml-4 shrink-0">
+            <button
+              onClick={handleRetry}
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-destructive/20 hover:bg-destructive/30 transition-colors"
+            >
+              Retry
+            </button>
+            <button
+              onClick={handleDismissError}
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-destructive/10 hover:bg-destructive/20 transition-colors"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="bg-card rounded-lg border border-border p-8 text-center shadow-sm">

@@ -54,22 +54,30 @@ export function createBankingRouter(bankingService: BankingService): Router {
   bankingRouter.post("/apply", async (req: Request, res: Response) => {
     try {
       const { shipId, year, amount } = req.body;
-      if (!shipId || !year || !amount) {
+      if (!shipId || !year || amount === undefined || amount === null) {
         return res
           .status(400)
           .json({ message: "shipId, year, and amount are required" });
       }
 
+      const parsedAmount = typeof amount === "number" ? amount : parseFloat(String(amount));
+
       const appliedEntry = await bankingService.applyBankedSurplus(
         shipId as string,
-        parseInt(year as string),
-        parseFloat(amount as string),
+        typeof year === "number" ? year : parseInt(String(year)),
+        parsedAmount,
       );
 
       res.status(201).json(appliedEntry);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown error";
       console.error("Error applying banked surplus:", error);
-      res.status(400).json({ message: error.message });
+      // M5: Differentiate validation errors from server errors
+      if (message.includes("Invalid amount") || message.includes("insufficient")) {
+        res.status(400).json({ message });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
     }
   });
 

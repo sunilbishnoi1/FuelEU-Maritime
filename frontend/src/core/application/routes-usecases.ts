@@ -1,7 +1,7 @@
 import type { Route } from '../domain/entities';
 import type { RouteRepository } from '../ports/outbound';
 import type { FetchRoutesUseCase, SetBaselineUseCase } from '../ports/inbound';
-import type { RouteFilters } from '../../types';
+import type { RouteFilters } from '../domain/entities';
 
 export class FetchRoutes implements FetchRoutesUseCase {
   private readonly routeRepository: RouteRepository;

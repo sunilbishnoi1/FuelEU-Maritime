@@ -2,13 +2,13 @@ import { type RoutesRepository } from "../../core/ports/routes_repository.js";
 import { type ComplianceRepository } from "../../core/ports/compliance_repository.js";
 import { type BankingRepository } from "../../core/ports/banking_repository.js";
 import { type PoolingRepository } from "../../core/ports/pooling_repository.js";
-import { type IShipRepository } from "../../core/ports/ship_repository.js"; // New import
+import { type IShipRepository } from "../../core/ports/ship_repository.js";
 import { type Route } from "../../core/domain/route.js";
 import { Compliance } from "../../core/domain/compliance.js";
 import { BankEntry } from "../../core/domain/bank_entry.js";
 import { Pool } from "../../core/domain/pool.js";
 import { PoolMember } from "../../core/domain/pool_member.js";
-import { Ship } from "../../core/domain/ship.js"; // New import
+import { type Ship } from "../../core/domain/ship.js";
 
 export class MockRoutesRepository implements RoutesRepository {
   private routes: Route[] = [];
@@ -16,6 +16,8 @@ export class MockRoutesRepository implements RoutesRepository {
 
   setRoutes(routes: Route[]): void {
     this.routes = routes;
+    // Also set baseline if one is marked
+    this.baseline = routes.find((r) => r.is_baseline) ?? null;
   }
 
   async findAll(): Promise<Route[]> {
@@ -24,11 +26,18 @@ export class MockRoutesRepository implements RoutesRepository {
 
   async findById(id: string): Promise<Route | null> {
     const route = this.routes.find((r) => r.id === id);
-    return Promise.resolve(route || null);
+    return Promise.resolve(route ?? null);
   }
 
+  // M8: Fixed — search by route_id field, not id
   async findByRouteId(routeId: string): Promise<Route | null> {
-    return this.findById(routeId);
+    const route = this.routes.find((r) => r.route_id === routeId);
+    // Fallback to id search for backward compatibility with tests that use id as routeId
+    if (!route) {
+      const byId = this.routes.find((r) => r.id === routeId);
+      return Promise.resolve(byId ?? null);
+    }
+    return Promise.resolve(route);
   }
 
   async setBaseline(id: string): Promise<Route | null> {
@@ -68,10 +77,10 @@ export class MockComplianceRepository implements ComplianceRepository {
     year: number,
   ): Promise<Compliance | null> {
     const key = `${shipId}-${year}`;
-    return Promise.resolve(this.compliances.get(key) || null);
+    return Promise.resolve(this.compliances.get(key) ?? null);
   }
 
-  async save(compliance: Compliance): Promise<Compliance | null> {
+  async save(compliance: Compliance): Promise<Compliance> {
     const key = `${compliance.ship_id}-${compliance.year}`;
     this.compliances.set(key, compliance);
     return Promise.resolve(compliance);
@@ -114,6 +123,25 @@ export class MockBankingRepository implements BankingRepository {
     return Promise.resolve(total);
   }
 
+  // H2: Transactional apply implementation for mocks
+  async applyWithinTransaction(
+    shipId: string,
+    year: number,
+    entry: BankEntry,
+  ): Promise<BankEntry> {
+    const availableSurplus = await this.getAvailableSurplus(shipId, year);
+    const amountToApply = Math.abs(entry.amount_gco2eq);
+
+    if (amountToApply > availableSurplus) {
+      throw new Error(
+        "Invalid amount to apply or insufficient banked surplus.",
+      );
+    }
+
+    this.bankEntries.push(entry);
+    return Promise.resolve(entry);
+  }
+
   getAll(): BankEntry[] {
     return this.bankEntries;
   }
@@ -138,6 +166,14 @@ export class MockPoolingRepository implements PoolingRepository {
     return Promise.resolve(members);
   }
 
+  // C3: Atomic save for pool + members
+  async savePoolWithMembers(pool: Pool, members: PoolMember[]): Promise<void> {
+    this.pools.push(pool);
+    for (const member of members) {
+      this.poolMembers.push(member);
+    }
+  }
+
   getAll(): PoolMember[] {
     return this.poolMembers;
   }
@@ -149,12 +185,21 @@ export class MockPoolingRepository implements PoolingRepository {
 
 export class MockShipRepository implements IShipRepository {
   private ships: Ship[] = [
-    { id: "ship-001", name: "Ship A" },
-    { id: "ship-002", name: "Ship B" },
-    { id: "ship-003", name: "Ship C" },
+    { id: "ship-001", name: "Ship A", route_id: "route-001" },
+    { id: "ship-002", name: "Ship B", route_id: "route-002" },
+    { id: "ship-003", name: "Ship C", route_id: "route-003" },
   ];
+
+  setShips(ships: Ship[]): void {
+    this.ships = ships;
+  }
 
   async getAllShips(): Promise<Ship[]> {
     return Promise.resolve(this.ships);
+  }
+
+  async findById(shipId: string): Promise<Ship | null> {
+    const ship = this.ships.find((s) => s.id === shipId);
+    return Promise.resolve(ship ?? null);
   }
 }

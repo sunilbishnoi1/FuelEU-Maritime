@@ -1,11 +1,10 @@
-import type { ComplianceBalance } from '../domain/entities';
+import type { ComplianceBalance, BankingSummary } from '../domain/entities';
 import type { ComplianceRepository } from '../ports/outbound';
 import type {
   FetchComplianceBalanceUseCase,
   BankSurplusUseCase,
   ApplyBankedCreditUseCase,
 } from '../ports/inbound';
-import type { BankingSummary } from '../../types';
 
 export class FetchComplianceBalance implements FetchComplianceBalanceUseCase {
   private readonly complianceRepository: ComplianceRepository;

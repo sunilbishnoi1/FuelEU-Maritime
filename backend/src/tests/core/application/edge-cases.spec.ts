@@ -391,6 +391,10 @@ describe("Edge Cases Tests", () => {
 
     it("should preserve total balance with complex allocation", async () => {
       const shipIds: string[] = [];
+      // Add a large surplus ship to guarantee the pool total stays positive
+      const anchorCompliance = createCompliance("ship-anchor", 2025, 100000);
+      await mockComplianceRepository.save(anchorCompliance);
+      shipIds.push("ship-anchor");
       for (let i = 0; i < 50; i++) {
         const cb = Math.sin(i) * 1000; // Mixed surplus and deficit
         const compliance = createCompliance(`ship-${i}`, 2025, cb);

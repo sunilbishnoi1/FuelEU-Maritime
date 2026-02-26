@@ -42,3 +42,40 @@ export interface Pool {
   poolSum: number;
   isValid: boolean;
 }
+
+/** Banking KPI summary for displaying cb_before, applied, cb_after */
+export interface BankingSummary {
+  year: number;
+  cb_before: number;
+  applied: number;
+  cb_after: number;
+}
+
+/** Adjusted compliance balance per ship for pooling */
+export interface AdjustedCompliance {
+  ship_id: string;
+  year: number;
+  adjusted_cb_gco2eq: number;
+}
+
+/** Request shape for creating a pool */
+export interface PoolCreationRequest {
+  year: number;
+  member_ship_ids: string[];
+}
+
+/** Filter parameters for routes */
+export interface RouteFilters {
+  vesselType?: string;
+  fuelType?: string;
+  year?: number;
+}
+
+/** Display-level pool member with optional ship name */
+export interface PoolMemberDisplay {
+  ship_id: string;
+  pool_id: string;
+  cb_before: number;
+  cb_after: number | null;
+  ship_name?: string;
+}

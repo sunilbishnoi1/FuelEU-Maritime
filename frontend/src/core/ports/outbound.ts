@@ -1,5 +1,4 @@
-import type { Route, ComplianceBalance, Pool } from '../domain/entities';
-import type { RouteFilters, BankingSummary, AdjustedCompliance, PoolCreationRequest } from '../../types';
+import type { Route, ComplianceBalance, Pool, RouteFilters, BankingSummary, AdjustedCompliance, PoolCreationRequest } from '../domain/entities';
 
 export interface RouteRepository {
   getRoutes(filters?: RouteFilters): Promise<Route[]>;

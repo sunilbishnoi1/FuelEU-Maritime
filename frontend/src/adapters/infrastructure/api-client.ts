@@ -2,7 +2,7 @@ import {
   type ApiRoute,
   type Compliance,
   type BankEntry,
-  type PoolMember,
+  type ApiPoolMember,
 } from "../../types";
 
 const getApiBaseUrl = () => {
@@ -26,16 +26,30 @@ const API_BASE_URL = getApiBaseUrl();
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Something went wrong");
+    let message = `Request failed with status ${response.status}`;
+    try {
+      const errorData = await response.json();
+      if (errorData.message) {
+        message = errorData.message;
+      }
+    } catch {
+      // Response body is not JSON — use the default message
+    }
+    throw new Error(message);
   }
   return response.json();
 }
 
 // Routes API
 export const routesApi = {
-getAllRoutes: async (): Promise<ApiRoute[]> => {
-  const response = await fetch(`${API_BASE_URL}/routes`);
+getAllRoutes: async (filters?: { vesselType?: string; fuelType?: string; year?: number }): Promise<ApiRoute[]> => {
+  const params = new URLSearchParams();
+  if (filters?.vesselType) params.append('vesselType', filters.vesselType);
+  if (filters?.fuelType) params.append('fuelType', filters.fuelType);
+  if (filters?.year) params.append('year', String(filters.year));
+  const queryString = params.toString();
+  const url = queryString ? `${API_BASE_URL}/routes?${queryString}` : `${API_BASE_URL}/routes`;
+  const response = await fetch(url);
   const data = await handleResponse<ApiRoute[]>(response);
 
   // keep snake_case to match ApiRoute interface
@@ -159,7 +173,7 @@ export const bankingApi = {
 
 // Pooling API
 export const poolingApi = {
-  createPool: async (year: number, shipIds: string[]): Promise<PoolMember[]> => {
+  createPool: async (year: number, shipIds: string[]): Promise<ApiPoolMember[]> => {
     const response = await fetch(`${API_BASE_URL}/pools`, {
       method: "POST",
       headers: {
@@ -167,6 +181,6 @@ export const poolingApi = {
       },
       body: JSON.stringify({ year, shipIds }),
     });
-    return handleResponse<PoolMember[]>(response);
+    return handleResponse<ApiPoolMember[]>(response);
   },
 };

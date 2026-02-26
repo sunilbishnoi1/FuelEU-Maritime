@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   fetchAdjustedComplianceBalanceUseCase,
   createPoolUseCase,
-} from '../../../core/application/service-locator';
-import type { AdjustedCompliance, PoolCreationRequest } from '../../../types';
-import type { Pool } from '../../../core/domain/entities';
-import { YearSelector } from '../banking/year-selector'; // Reusing YearSelector
-import { AvailableShips } from '../pooling/available-ships';
-import { PoolMembers } from '../pooling/pool-members';
-import { PoolValidation } from '../pooling/pool-validation';
-import { CreatePoolButton } from '../pooling/create-pool-button';
+} from "../../../composition-root";
+import type {
+  AdjustedCompliance,
+  PoolCreationRequest,
+  Pool,
+  PoolMemberDisplay,
+} from "../../../core/domain/entities";
+import { YearSelector } from "../banking/year-selector";
+import { AvailableShips } from "../pooling/available-ships";
+import { PoolMembers } from "../pooling/pool-members";
+import { PoolValidation } from "../pooling/pool-validation";
+import { CreatePoolButton } from "../pooling/create-pool-button";
 
-// Helper to generate a range of years (re-using from banking-page)
+// Helper to generate a range of years
 const generateYears = (startYear: number, endYear: number): number[] => {
   const years = [];
   for (let year = startYear; year <= endYear; year++) {
@@ -20,120 +24,266 @@ const generateYears = (startYear: number, endYear: number): number[] => {
   return years;
 };
 
+/**
+ * Simulate greedy allocation to validate pooling rules 2 & 3 on frontend.
+ * Returns { isValid, validationErrors, simulatedMembers }.
+ */
+function simulatePoolAllocation(selectedShips: AdjustedCompliance[]): {
+  isValid: boolean;
+  validationErrors: string[];
+  simulatedMembers: Array<{
+    ship_id: string;
+    cb_before: number;
+    cb_after: number;
+  }>;
+} {
+  const errors: string[] = [];
+  const totalSum = selectedShips.reduce(
+    (s, ship) => s + ship.adjusted_cb_gco2eq,
+    0,
+  );
+
+  // Rule 1: Sum must be >= 0
+  if (totalSum < 0) {
+    errors.push("Total adjusted CB of selected ships must be ≥ 0.");
+  }
+
+  // Separate deficit and surplus ships
+  const deficitShips = selectedShips.filter((s) => s.adjusted_cb_gco2eq < 0);
+  const surplusShips = selectedShips.filter((s) => s.adjusted_cb_gco2eq >= 0);
+
+  // Simulate greedy allocation: distribute surplus to cover deficits
+  let remainingSurplus = surplusShips.reduce(
+    (s, ship) => s + ship.adjusted_cb_gco2eq,
+    0,
+  );
+
+  const simulatedMembers = selectedShips.map((ship) => {
+    if (ship.adjusted_cb_gco2eq >= 0) {
+      // Surplus ship contributes proportionally
+      return {
+        ship_id: ship.ship_id,
+        cb_before: ship.adjusted_cb_gco2eq,
+        cb_after: 0,
+      };
+    }
+    return {
+      ship_id: ship.ship_id,
+      cb_before: ship.adjusted_cb_gco2eq,
+      cb_after: ship.adjusted_cb_gco2eq,
+    };
+  });
+
+  // Greedy: allocate surplus to deficit ships
+  for (const member of simulatedMembers) {
+    if (member.cb_before < 0 && remainingSurplus > 0) {
+      const needed = Math.abs(member.cb_before);
+      const allocated = Math.min(needed, remainingSurplus);
+      member.cb_after = member.cb_before + allocated;
+      remainingSurplus -= allocated;
+    }
+  }
+
+  // Distribute remaining surplus back to surplus ships proportionally
+  if (remainingSurplus > 0 && surplusShips.length > 0) {
+    const totalOriginalSurplus = surplusShips.reduce(
+      (s, ship) => s + ship.adjusted_cb_gco2eq,
+      0,
+    );
+    for (const member of simulatedMembers) {
+      const originalShip = selectedShips.find(
+        (s) => s.ship_id === member.ship_id,
+      );
+      if (
+        originalShip &&
+        originalShip.adjusted_cb_gco2eq >= 0 &&
+        totalOriginalSurplus > 0
+      ) {
+        const proportion =
+          originalShip.adjusted_cb_gco2eq / totalOriginalSurplus;
+        member.cb_after = remainingSurplus * proportion;
+      }
+    }
+  }
+
+  // Rule 2: Deficit ship cannot exit worse (cb_after < cb_before)
+  for (const ship of deficitShips) {
+    const simulated = simulatedMembers.find((m) => m.ship_id === ship.ship_id);
+    if (simulated && simulated.cb_after < simulated.cb_before) {
+      errors.push(
+        `Deficit ship ${ship.ship_id} would exit with worse CB (${simulated.cb_after.toFixed(2)} < ${simulated.cb_before.toFixed(2)}).`,
+      );
+    }
+  }
+
+  // Rule 3: Surplus ship cannot exit negative (cb_after < 0)
+  for (const ship of surplusShips) {
+    const simulated = simulatedMembers.find((m) => m.ship_id === ship.ship_id);
+    if (simulated && simulated.cb_after < 0) {
+      errors.push(
+        `Surplus ship ${ship.ship_id} would exit negative (cb_after=${simulated.cb_after.toFixed(2)}).`,
+      );
+    }
+  }
+
+  return {
+    isValid: errors.length === 0 && selectedShips.length > 0,
+    validationErrors: errors,
+    simulatedMembers,
+  };
+}
+
 const PoolingPage: React.FC = () => {
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const [availableShips, setAvailableShips] = useState<AdjustedCompliance[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear(),
+  );
+  const [availableShips, setAvailableShips] = useState<AdjustedCompliance[]>(
+    [],
+  );
   const [selectedShipIds, setSelectedShipIds] = useState<string[]>([]);
   const [currentPool, setCurrentPool] = useState<Pool | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [poolSum, setPoolSum] = useState<number>(0);
   const [isPoolValid, setIsPoolValid] = useState<boolean>(false);
-  const [validationError, setValidationError] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const fetchPoolingData = async (year: number) => {
+  const fetchPoolingData = useCallback(async (year: number) => {
     try {
       setLoading(true);
-      const adjustedCbs = await fetchAdjustedComplianceBalanceUseCase.execute(year);
+      setError(null);
+      const adjustedCbs =
+        await fetchAdjustedComplianceBalanceUseCase.execute(year);
       setAvailableShips(adjustedCbs);
-      // Clear selected ships and current pool when year changes
       setSelectedShipIds([]);
       setCurrentPool(null);
     } catch (err) {
-      setError('Failed to fetch pooling data.');
+      setError("Failed to fetch pooling data.");
       console.error(err);
       setAvailableShips([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPoolingData(selectedYear);
-  }, [selectedYear]);
+  }, [selectedYear, fetchPoolingData]);
 
   useEffect(() => {
-    // Calculate pool sum and validate pool whenever selected ships or available ships change
-    const members = availableShips.filter(ship => selectedShipIds.includes(ship.ship_id));
-    const sum = members.reduce((acc, member) => acc + member.adjusted_cb_gco2eq, 0);
+    const selectedShips = availableShips.filter((ship) =>
+      selectedShipIds.includes(ship.ship_id),
+    );
+    const sum = selectedShips.reduce(
+      (acc, member) => acc + member.adjusted_cb_gco2eq,
+      0,
+    );
     setPoolSum(sum);
 
-    // Basic validation rules (as per FEplan.md)
-    // 1. Sum(adjustedCB) >= 0
-    // 2. Deficit ship cannot exit worse (cb_after < cb_before for deficit ships)
-    // 3. Surplus ship cannot exit negative (cb_after < 0 for surplus ships)
-    // For now, we'll implement rule 1. Rules 2 and 3 require more complex logic involving cb_before/cb_after which are not directly in AdjustedCompliance.
-    // This will be handled when creating the pool on the backend and validating the response.
-    const isValid = sum >= 0 && selectedShipIds.length > 0;
-    setIsPoolValid(isValid);
-    
-    // Clear validation error when pool becomes valid
-    if (isValid) {
-      setValidationError('');
+    if (selectedShipIds.length === 0) {
+      setIsPoolValid(false);
+      setValidationErrors([]);
+      return;
     }
+
+    // Full validation including rules 2 & 3
+    const { isValid, validationErrors: errors } =
+      simulatePoolAllocation(selectedShips);
+    setIsPoolValid(isValid);
+    setValidationErrors(errors);
   }, [selectedShipIds, availableShips]);
 
   const handleShipSelectionChange = (shipId: string, isSelected: boolean) => {
-    setSelectedShipIds(prev =>
-      isSelected ? [...prev, shipId] : prev.filter(id => id !== shipId)
+    setSelectedShipIds((prev) =>
+      isSelected ? [...prev, shipId] : prev.filter((id) => id !== shipId),
     );
   };
 
   const handleCreatePool = async () => {
     if (!isPoolValid) {
-      setValidationError('Pool is not valid. Please ensure the sum of adjusted CB is non-negative and at least one ship is selected.');
       return;
     }
-    setValidationError('');
     try {
       setLoading(true);
+      setError(null);
       const poolRequest: PoolCreationRequest = {
         year: selectedYear,
         member_ship_ids: selectedShipIds,
       };
       const newPool = await createPoolUseCase.execute(poolRequest);
       setCurrentPool(newPool);
-      // After creating a pool, potentially refetch available ships or update their status
       await fetchPoolingData(selectedYear);
     } catch (err) {
-      setError('Failed to create pool.');
+      setError("Failed to create pool.");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (error) {
-    return (
-      <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 text-destructive">
-        <h3 className="font-semibold mb-2">Error Loading Pooling Data</h3>
-        <p>{error}</p>
-      </div>
-    );
-  }
+  const handleDismissError = () => {
+    setError(null);
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    fetchPoolingData(selectedYear);
+  };
 
   const currentYear = new Date().getFullYear();
   const years = generateYears(currentYear - 5, currentYear + 5);
 
-  const membersInPoolDisplay = currentPool?.members.map(member => {
-    const ship = availableShips.find(s => s.ship_id === member.ship_id);
-    return {
-      pool_id: member.pool_id,
-      ship_id: member.ship_id,
-      cb_before: member.cb_before,
-      cb_after: member.cb_after,
-      ship_name: ship ? `Ship ${ship.ship_id}` : member.ship_id,
-    };
-  }) || [];
+  const membersInPoolDisplay: PoolMemberDisplay[] =
+    currentPool?.members.map((member) => {
+      const ship = availableShips.find((s) => s.ship_id === member.ship_id);
+      return {
+        pool_id: member.pool_id,
+        ship_id: member.ship_id,
+        cb_before: member.cb_before,
+        cb_after: member.cb_after,
+        ship_name: ship ? `Ship ${ship.ship_id}` : member.ship_id,
+      };
+    }) ?? [];
 
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-2">Pooling Overview</h1>
-        <p className="text-secondary-600">Create and manage compliance pooling arrangements</p>
+        <h1 className="text-4xl font-bold text-secondary-900 mb-2">
+          Pooling Overview
+        </h1>
+        <p className="text-secondary-600">
+          Create and manage compliance pooling arrangements
+        </p>
       </div>
 
-      <YearSelector selectedYear={selectedYear} onYearChange={setSelectedYear} availableYears={years} />
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive mb-6 flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold mb-1">Error</h3>
+            <p className="text-sm">{error}</p>
+          </div>
+          <div className="flex gap-2 ml-4 shrink-0">
+            <button
+              onClick={handleRetry}
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-destructive/20 hover:bg-destructive/30 transition-colors"
+            >
+              Retry
+            </button>
+            <button
+              onClick={handleDismissError}
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-destructive/10 hover:bg-destructive/20 transition-colors"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      <YearSelector
+        selectedYear={selectedYear}
+        onYearChange={setSelectedYear}
+        availableYears={years}
+      />
 
       {loading ? (
         <div className="bg-card rounded-lg border border-border p-8 text-center mt-6 shadow-sm">
@@ -150,14 +300,22 @@ const PoolingPage: React.FC = () => {
             />
           </div>
           <div>
-            {validationError && (
+            {validationErrors.length > 0 && (
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-destructive mb-4">
-                <p className="text-sm font-medium">{validationError}</p>
+                <p className="text-sm font-medium mb-1">Validation Errors:</p>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  {validationErrors.map((err, idx) => (
+                    <li key={idx}>{err}</li>
+                  ))}
+                </ul>
               </div>
             )}
             <PoolValidation poolSum={poolSum} isPoolValid={isPoolValid} />
             <PoolMembers members={membersInPoolDisplay} />
-            <CreatePoolButton onCreatePool={handleCreatePool} isPoolValid={isPoolValid} />
+            <CreatePoolButton
+              onCreatePool={handleCreatePool}
+              isPoolValid={isPoolValid}
+            />
           </div>
         </div>
       )}

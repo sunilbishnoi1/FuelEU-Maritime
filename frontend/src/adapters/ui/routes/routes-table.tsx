@@ -1,6 +1,6 @@
-import React from 'react';
-import { Package } from 'lucide-react';
-import type { Route } from '../../../core/domain/entities';
+import React from "react";
+import { Package, Star } from "lucide-react";
+import type { Route } from "../../../core/domain/entities";
 import {
   Table,
   TableBody,
@@ -8,15 +8,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../shared/components/table';
-import { Button } from '../../../shared/components/button';
+} from "../../../shared/components/table";
+import { Button } from "../../../shared/components/button";
+import { Badge } from "../../../shared/components/badge";
 
 interface RoutesTableProps {
   routes: Route[];
   onSetBaseline: (id: string) => void;
 }
 
-export const RoutesTable: React.FC<RoutesTableProps> = ({ routes, onSetBaseline }) => {
+export const RoutesTable: React.FC<RoutesTableProps> = ({
+  routes,
+  onSetBaseline,
+}) => {
   if (routes.length === 0) {
     return (
       <div className="bg-card rounded-lg border border-border p-16 text-center shadow-sm">
@@ -24,9 +28,12 @@ export const RoutesTable: React.FC<RoutesTableProps> = ({ routes, onSetBaseline 
           <div className="bg-muted rounded-full p-4 mb-4">
             <Package className="w-10 h-10 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold text-secondary-900 mb-2">No Routes Found</h3>
+          <h3 className="text-lg font-semibold text-secondary-900 mb-2">
+            No Routes Found
+          </h3>
           <p className="text-muted-foreground text-sm">
-            No shipping routes match your current filters. Try adjusting your search criteria or clearing filters to see all available routes.
+            No shipping routes match your current filters. Try adjusting your
+            search criteria or clearing filters to see all available routes.
           </p>
         </div>
       </div>
@@ -38,15 +45,33 @@ export const RoutesTable: React.FC<RoutesTableProps> = ({ routes, onSetBaseline 
       <Table>
         <TableHeader>
           <TableRow className="bg-secondary-50 border-b border-border">
-            <TableHead className="text-secondary-900 font-semibold">Route ID</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Vessel Type</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Fuel Type</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Year</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">GHG Intensity</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Fuel (t)</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Distance (km)</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Emissions (t)</TableHead>
-            <TableHead className="text-secondary-900 font-semibold">Action</TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Route ID
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Vessel Type
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Fuel Type
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Year
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              GHG Intensity (gCO₂e/MJ)
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Fuel (t)
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Distance (km)
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Emissions (t)
+            </TableHead>
+            <TableHead className="text-secondary-900 font-semibold">
+              Action
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,25 +79,60 @@ export const RoutesTable: React.FC<RoutesTableProps> = ({ routes, onSetBaseline 
             <TableRow
               key={route.id}
               className={`border-b border-border hover:bg-primary-50/50 transition-colors ${
-                idx % 2 === 0 ? 'bg-card' : 'bg-secondary-50/30'
+                route.isBaseline
+                  ? "bg-primary-50/30"
+                  : idx % 2 === 0
+                    ? "bg-card"
+                    : "bg-secondary-50/30"
               }`}
             >
-              <TableCell className="font-semibold text-primary-700">{route.routeId}</TableCell>
-              <TableCell className="text-secondary-700">{route.vesselType}</TableCell>
-              <TableCell className="text-secondary-700">{route.fuelType}</TableCell>
+              <TableCell className="font-semibold text-primary-700">
+                <span className="flex items-center gap-2">
+                  {route.routeId}
+                  {route.isBaseline && (
+                    <Badge
+                      variant="success"
+                      className="text-xs flex items-center gap-1"
+                    >
+                      <Star className="w-3 h-3" />
+                      Baseline
+                    </Badge>
+                  )}
+                </span>
+              </TableCell>
+              <TableCell className="text-secondary-700">
+                {route.vesselType}
+              </TableCell>
+              <TableCell className="text-secondary-700">
+                {route.fuelType}
+              </TableCell>
               <TableCell className="text-secondary-700">{route.year}</TableCell>
-              <TableCell className="text-secondary-700 font-mono text-sm">{route.ghgIntensity.toFixed(2)}</TableCell>
-              <TableCell className="text-secondary-700 font-mono text-sm">{route.fuelConsumption.toFixed(2)}</TableCell>
-              <TableCell className="text-secondary-700 font-mono text-sm">{route.distance.toFixed(2)}</TableCell>
-              <TableCell className="text-secondary-700 font-mono text-sm">{route.totalEmissions.toFixed(2)}</TableCell>
+              <TableCell className="text-secondary-700 font-mono text-sm">
+                {route.ghgIntensity.toFixed(2)}
+              </TableCell>
+              <TableCell className="text-secondary-700 font-mono text-sm">
+                {route.fuelConsumption.toFixed(2)}
+              </TableCell>
+              <TableCell className="text-secondary-700 font-mono text-sm">
+                {route.distance.toFixed(2)}
+              </TableCell>
+              <TableCell className="text-secondary-700 font-mono text-sm">
+                {route.totalEmissions.toFixed(2)}
+              </TableCell>
               <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onSetBaseline(route.id)}
-                >
-                  Set Baseline
-                </Button>
+                {route.isBaseline ? (
+                  <span className="text-xs text-muted-foreground italic">
+                    Current baseline
+                  </span>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onSetBaseline(route.id)}
+                  >
+                    Set Baseline
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}

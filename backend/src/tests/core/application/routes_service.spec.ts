@@ -9,7 +9,8 @@ import {
   ALL_ROUTES,
   createRoute,
 } from "tests/fixtures/test-data";
-import type { Route } from "core/domain/route";
+import { TARGET_INTENSITY_2025 } from "shared/constants";
+import type { ComparisonDto } from "core/application/dtos";
 
 describe("RoutesService", () => {
   let routesService: RoutesService;
@@ -84,46 +85,53 @@ describe("RoutesService", () => {
 
       expect(comparison).toHaveLength(4); // Non-baseline routes
 
-      // Check ROUTE_2 (95.0 vs baseline 89.3368)
+      // H1: compliant flag now checks against TARGET_INTENSITY_2025 (89.3368)
+      // Check ROUTE_2 (95.0) - not compliant because 95.0 > 89.3368
       const route2Comparison = comparison.find(
-        (r: Route) => r.id === "route-2",
+        (r: ComparisonDto) => r.id === "route-2",
       );
       expect(route2Comparison).toBeDefined();
-      expect(route2Comparison?.compliant).toBe(false); // 95 > 89.3368
+      expect(route2Comparison?.compliant).toBe(false); // 95 > TARGET
       expect(route2Comparison?.percentDiff).toBeCloseTo(6.36, 1);
 
-      // Check ROUTE_3 (85.0 vs baseline 89.3368)
+      // Check ROUTE_3 (85.0) - compliant because 85 <= 89.3368
       const route3Comparison = comparison.find(
-        (r: Route) => r.id === "route-3",
+        (r: ComparisonDto) => r.id === "route-3",
       );
       expect(route3Comparison).toBeDefined();
-      expect(route3Comparison?.compliant).toBe(true); // 85 < 89.3368
+      expect(route3Comparison?.compliant).toBe(true); // 85 < TARGET
       expect(route3Comparison?.percentDiff).toBeCloseTo(-4.81, 1);
     });
 
     it("should return empty array when no baseline is set", async () => {
-      mockRoutesRepository.setRoutes(ALL_ROUTES);
+      // Set routes with no baseline marked
+      const routesWithNoBaseline = ALL_ROUTES.map(r => ({ ...r, is_baseline: false }));
+      mockRoutesRepository.setRoutes(routesWithNoBaseline);
 
       const comparison = await routesService.getComparison();
 
       expect(comparison).toHaveLength(0);
     });
 
-    it("should calculate correct compliance flag for compliant routes", async () => {
+    it("should calculate correct compliance flag using TARGET_INTENSITY_2025", async () => {
       const route1 = createRoute("route-1", 89.3368, true);
-      const route2 = createRoute("route-2", 89.3368, false); // Exactly equal to baseline
-      const route3 = createRoute("route-3", 89.0, false); // Lower than baseline
+      const route2 = createRoute("route-2", 89.3368, false); // Exactly equal to target → compliant
+      const route3 = createRoute("route-3", 89.0, false); // Lower than target → compliant
+      const route4 = createRoute("route-4", 90.0, false); // Above target → not compliant
 
-      mockRoutesRepository.setRoutes([route1, route2, route3]);
+      mockRoutesRepository.setRoutes([route1, route2, route3, route4]);
       await mockRoutesRepository.setBaseline("route-1");
 
       const comparison = await routesService.getComparison();
 
-      const compliantRoute = comparison.find((r: Route) => r.id === "route-2");
-      expect(compliantRoute?.compliant).toBe(true);
+      const equalToTarget = comparison.find((r: ComparisonDto) => r.id === "route-2");
+      expect(equalToTarget?.compliant).toBe(true); // Exactly at target
 
-      const exceedingRoute = comparison.find((r: Route) => r.id === "route-3");
-      expect(exceedingRoute?.compliant).toBe(true);
+      const belowTarget = comparison.find((r: ComparisonDto) => r.id === "route-3");
+      expect(belowTarget?.compliant).toBe(true); // Below target
+
+      const aboveTarget = comparison.find((r: ComparisonDto) => r.id === "route-4");
+      expect(aboveTarget?.compliant).toBe(false); // Above target
     });
 
     it("should correctly calculate percentage difference", async () => {
@@ -140,11 +148,14 @@ describe("RoutesService", () => {
 
       const comparison = await routesService.getComparison();
 
-      const higher = comparison.find((r: Route) => r.id === "route-150");
+      const higher = comparison.find((r: ComparisonDto) => r.id === "route-150");
       expect(higher?.percentDiff).toBe(50);
+      // H1: compliant flag against TARGET (89.3368), not baseline (100)
+      expect(higher?.compliant).toBe(false); // 150 > 89.3368
 
-      const lower = comparison.find((r: Route) => r.id === "route-50");
+      const lower = comparison.find((r: ComparisonDto) => r.id === "route-50");
       expect(lower?.percentDiff).toBe(-50);
+      expect(lower?.compliant).toBe(true); // 50 <= 89.3368
     });
   });
 });

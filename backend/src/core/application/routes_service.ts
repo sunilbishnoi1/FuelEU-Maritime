@@ -1,5 +1,9 @@
-import { type Route } from "../domain/route";
-import { type RoutesRepository } from "../ports/routes_repository";
+import { type Route } from "../domain/route.js";
+import { type RoutesRepository } from "../ports/routes_repository.js";
+import { type ComparisonDto } from "./dtos.js";
+import {
+  TARGET_INTENSITY_2025,
+} from "../../shared/constants.js";
 
 export class RoutesService {
   constructor(private routesRepository: RoutesRepository) {}
@@ -9,30 +13,25 @@ export class RoutesService {
   }
 
   async setRouteAsBaseline(id: string): Promise<Route | null> {
-    // First, unset the current baseline if any
-    const currentBaseline = await this.routesRepository.findBaseline();
-    if (currentBaseline && currentBaseline.id !== id) {
-      // Assuming a method to unset baseline exists or can be handled internally by setBaseline
-      // For now, we'll rely on the repository to handle ensuring only one baseline
-    }
     return this.routesRepository.setBaseline(id);
   }
 
-  async getComparison(): Promise<any[]> {
+  async getComparison(): Promise<ComparisonDto[]> {
     const baseline = await this.routesRepository.findBaseline();
     if (!baseline) {
-      return []; // Or throw an error, depending on desired behavior
+      return [];
     }
 
     const nonBaselineRoutes =
       await this.routesRepository.findNonBaselineRoutes();
 
-    const comparison = nonBaselineRoutes.map((route: Route) => {
+    const comparison: ComparisonDto[] = nonBaselineRoutes.map((route: Route) => {
       const percentDiff =
         ((route.ghg_intensity - baseline.ghg_intensity) /
           baseline.ghg_intensity) *
         100;
-      const compliant = route.ghg_intensity <= baseline.ghg_intensity;
+      // H1: compliant flag uses regulatory target, not baseline intensity
+      const compliant = route.ghg_intensity <= TARGET_INTENSITY_2025;
       return {
         ...route,
         percentDiff: parseFloat(percentDiff.toFixed(2)),

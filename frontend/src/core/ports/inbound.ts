@@ -1,5 +1,4 @@
-import type { Route, ComplianceBalance, Pool } from '../domain/entities';
-import type { RouteFilters, BankingSummary, AdjustedCompliance, PoolCreationRequest } from '../../types';
+import type { Route, ComplianceBalance, Pool, RouteFilters, BankingSummary, AdjustedCompliance, PoolCreationRequest } from '../domain/entities';
 
 // Use Cases for Routes Tab
 export interface FetchRoutesUseCase {
